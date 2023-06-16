@@ -62,7 +62,7 @@ Note: This lab uses a Minikube Kubernetes cluster
    1. `kubectl delete pvc data-vault-0 data-vault-1 data-vault-2  data-vault-3 data-vault-4 data-vault-5`
 
 # References 
-* https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/ha-with-raft)
+* https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/ha-with-raft
 * HashiCorp GitHub repo, docs.
 
 # Other Scenarios
