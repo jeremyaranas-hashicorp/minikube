@@ -4,6 +4,7 @@
   * Can be installed using binary releases or package manager
 * Minikube
 * Docker
+* `kubectl` CLI installed locally
 
 Note: This lab uses a Minikube Kubernetes cluster
 
@@ -60,8 +61,32 @@ Note: This lab uses a Minikube Kubernetes cluster
 2. Remove PVCs
    1. `kubectl delete pvc data-vault-0 data-vault-1 data-vault-2  data-vault-3 data-vault-4 data-vault-5`
 
-
-
 # References 
 * https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/ha-with-raft)
 * HashiCorp GitHub repo, docs.
+
+# Other Scenarios
+
+* Upgrading Vault via Helm chart version
+  * `helm install vault hashicorp/vault --version 0.21.0` 
+  * `kubectl exec -ti vault-0 -- vault status`
+    * Vault version 1.11.2
+  * `helm upgrade vault hashicorp/vault --version=0.22.1` 
+  * `kubectl exec -ti vault-0 -- vault status`
+    * Vault version 1.11.2
+  * `kubectl delete pod vault-0`
+  * `kubectl exec -ti vault-0 -- vault status`
+    * Vault version 1.12.0
+* Upgrading Vault via values override file
+  * `helm install vault hashicorp/vault --values vault-values.yaml`
+  * `kubectl exec -ti vault-0 -- vault status`
+    * Vault version 1.11.2
+  * Edit vault-values.yaml server.image.tag to 1.12.0-ent
+  * `helm upgrade vault hashicorp/vault --values vault-values.yaml`
+  * `kubectl exec -ti vault-0 -- vault status`
+    * Vault version 1.11.2
+  * `kubectl delete pod vault-0`
+  * `kubectl exec -ti vault-0 -- vault status`
+    * Vault version 1.12.0
+
+
