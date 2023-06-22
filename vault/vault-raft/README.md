@@ -1,4 +1,5 @@
 # Prerequisites 
+
 * A Kubernetes cluster
 * [Helm](https://helm.sh/docs/intro/install/)
   * Can be installed using binary releases or package manager
@@ -41,31 +42,9 @@ Note: This lab uses a Minikube Kubernetes cluster
     1.  `kubectl port-forward vault-0 8200:8200`
     2.  Open http://127.0.0.1:8200 from a browser
 
-# Useful Commands
-
-* Check Kubernetes resources that were created using Helm
-  * `helm get manifest vault`
-* Check PVCs
-  * `kubectl get pvc`
-* Check statefulsets
-  * `kubectl get sts`
-* Check configmap
-  * `kubectl get configmap`
-* Scale replicas
-  * `kubectl scale statefulsets vault --replicas=<number_of_replicas>`
-
-# Cleanup
-
-1. Uninstall Vault Helm chart
-   1. `helm uninstall vault`
-2. Remove PVCs
-   1. `kubectl delete pvc data-vault-0 data-vault-1 data-vault-2  data-vault-3 data-vault-4 data-vault-5`
-
-# References 
-* https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/ha-with-raft
-* HashiCorp GitHub repo, docs.
-
 # Other Scenarios
+
+## Upgrade Vault
 
 * Upgrading Vault via Helm chart version
   * `helm install vault hashicorp/vault --version 0.21.0` 
@@ -89,4 +68,34 @@ Note: This lab uses a Minikube Kubernetes cluster
   * `kubectl exec -ti vault-0 -- vault status`
     * Vault version 1.12.0
 
+## Enabling Replication (PR)
 
+* Run replication script to enable replication and generate secondary activation token on primary, and enable replication on secondary
+  * `./enable_pr.sh`
+* Check replication status
+  * `kubectl exec -ti vault-0 -- vault read sys/replication/status -format=json`
+  * `kubectl exec -ti vault-3 -- vault read sys/replication/status -format=json`
+
+# Cleanup
+
+* Run cleanup script to cleanup k8s resources created by Helm chart and PVCs
+  * `./cleanup.sh`
+
+# Useful Commands
+
+* Check Kubernetes resources that were created using Helm
+  * `helm get manifest vault`
+* Check PVCs
+  * `kubectl get pvc`
+* Check statefulsets
+  * `kubectl get sts`
+* Check configmap
+  * `kubectl get configmap`
+* Scale replicas
+  * `kubectl scale statefulsets vault --replicas=<number_of_replicas>`
+* List Helm releases
+  * `helm list <name_of_release>`
+
+# References 
+* https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/ha-with-raft
+* HashiCorp GitHub repo, docs.

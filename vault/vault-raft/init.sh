@@ -1,4 +1,3 @@
-# init.sh
 echo 'INFO: Starting Raft cluster setup'
 
 # Configure cluster A
