@@ -1,3 +1,5 @@
+# This init script has been tested with Vault 1.11.2-ent
+
 echo 'INFO: Starting Raft cluster setup'
 
 # Configure cluster A

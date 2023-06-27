@@ -44,30 +44,72 @@ Note: This lab uses a Minikube Kubernetes cluster
 
 # Other Scenarios
 
-## Upgrade Vault
+## Upgrades
 
-* Upgrading Vault via Helm chart version
-  * `helm install vault hashicorp/vault --version 0.21.0` 
-  * `kubectl exec -ti vault-0 -- vault status`
-    * Vault version 1.11.2
-  * `helm upgrade vault hashicorp/vault --version=0.22.1` 
-  * `kubectl exec -ti vault-0 -- vault status`
-    * Vault version 1.11.2
-  * `kubectl delete pod vault-0`
-  * `kubectl exec -ti vault-0 -- vault status`
-    * Vault version 1.12.0
-* Upgrading Vault via values override file
-  * `helm install vault hashicorp/vault --values vault-values.yaml`
-  * `kubectl exec -ti vault-0 -- vault status`
-    * Vault version 1.11.2
+* Update Helm chart version
+  * Install Vault Helm chart 
+    * `helm install vault hashicorp/vault --version 0.20.0 --values vault-values.yaml` 
+  * Initialize cluster
+    * `./init.sh`
+  * Check `vault status`
+    * `kubectl exec -ti vault-0 -- vault status`
+      * Vault version is set to version in vault-values.yaml even though chart 0.20.0 maps to app version 1.10.3
+  * Update Helm chart version
+    * `helm upgrade vault hashicorp/vault --version=0.22.1 --values vault-values.yaml` 
+  * Check `vault status`
+    * `kubectl exec -ti vault-0 -- vault status`
+  * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
+    * Reschedule vault-2
+      * `kubectl delete pod vault-2`
+    * Reschedule vault-3
+      * `kubectl delete pod vault-3`
+    * Confirm that vault-0 is active
+      * `kubectl exec -ti vault-0 -- vault status`
+    * Login to Vault
+      * `kubectl exec vault-0 -- vault login $(jq -r ".root_token" cluster-a-keys.json)`
+    * Step down active node to transfer leadership
+      * `kubectl exec -ti vault-0 -- vault operator step-down`
+    * Confirm new leader
+      * `kubectl exec -ti vault-0 -- vault status`
+    * Reschedule vault-0
+    * `kubectl delete pod vault-0`
+  * Check `vault status`
+    * `kubectl exec -ti vault-2 -- vault status`
+      * Notice that Helm chart version is updated but Vault version is set to version in vault-values.yaml even though chart 0.22.1 maps to app version 1.12.0
+  
+* Upgrading Vault via values override file 
+  * Install Vault Helm chart
+    * `helm install vault hashicorp/vault --values vault-values.yaml`
+  * Run init script 
+    * `./init.sh`
+  * Check`vault status` to get version
+    * `kubectl exec -ti vault-0 -- vault status`
   * Edit vault-values.yaml server.image.tag to 1.12.0-ent
-  * `helm upgrade vault hashicorp/vault --values vault-values.yaml`
-  * `kubectl exec -ti vault-0 -- vault status`
-    * Vault version 1.11.2
-  * `kubectl delete pod vault-0`
-  * `kubectl exec -ti vault-0 -- vault status`
-    * Vault version 1.12.0
-
+  * Run Helm upgrade to deploy new version of Helm chart
+    * `helm upgrade vault hashicorp/vault --values vault-values.yaml`
+  * Check `vault status`
+    * `kubectl exec -ti vault-0 -- vault status`
+  * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
+    * Reschedule vault-2
+      * `kubectl delete pod vault-2`
+    * Reschedule vault-3
+      * `kubectl delete pod vault-3`
+    * Confirm that vault-0 is active
+      * `kubectl exec -ti vault-0 -- vault status`
+    * Login to Vault
+      * `kubectl exec vault-0 -- vault login $(jq -r ".root_token" cluster-a-keys.json)`
+    * Step down active node to transfer leadership
+      * `kubectl exec -ti vault-0 -- vault operator step-down`
+    * Confirm new leader
+      * `kubectl exec -ti vault-0 -- vault status`
+    * Reschedule vault-0
+    * `kubectl delete pod vault-0`
+  * Check `vault status`
+    * `kubectl exec -ti vault-2 -- vault status`
+      * Notice that version has been updated 
+  
+  Note that when a pod is rescheduled, it will need to be unsealed.
+    
 ## Enabling Replication (PR)
 
 * Run replication script to enable replication and generate secondary activation token on primary, and enable replication on secondary
