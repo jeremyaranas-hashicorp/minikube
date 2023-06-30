@@ -54,6 +54,8 @@ Note: This lab uses a Minikube Kubernetes cluster
   * Check `vault status`
     * `kubectl exec -ti vault-0 -- vault status`
       * Vault version is set to version in vault-values.yaml even though chart 0.20.0 maps to app version 1.10.3
+  * Check Helm chart version
+    * `helm ls`
   * Update Helm chart version
     * `helm upgrade vault hashicorp/vault --version=0.22.1 --values vault-values.yaml` 
   * Check `vault status`
@@ -75,6 +77,8 @@ Note: This lab uses a Minikube Kubernetes cluster
     * `kubectl delete pod vault-0`
   * Check `vault status`
     * `kubectl exec -ti vault-2 -- vault status`
+  * Check Helm chart version
+    * `helm ls`
       * Notice that Helm chart version is updated but Vault version is set to version in vault-values.yaml even though chart 0.22.1 maps to app version 1.12.0
   
 * Upgrading Vault via values override file 
