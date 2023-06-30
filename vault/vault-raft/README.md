@@ -60,11 +60,11 @@ Note: This lab uses a Minikube Kubernetes cluster
     * `helm upgrade vault hashicorp/vault --version=0.22.1 --values vault-values.yaml` 
   * Check `vault status`
     * `kubectl exec -ti vault-0 -- vault status`
-  * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
+  * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled and unsealed, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
+    * Reschedule vault-1
+      * `kubectl delete pod vault-1`
     * Reschedule vault-2
       * `kubectl delete pod vault-2`
-    * Reschedule vault-3
-      * `kubectl delete pod vault-3`
     * Confirm that vault-0 is active
       * `kubectl exec -ti vault-0 -- vault status`
     * Login to Vault
@@ -93,7 +93,7 @@ Note: This lab uses a Minikube Kubernetes cluster
     * `helm upgrade vault hashicorp/vault --values vault-values.yaml`
   * Check `vault status`
     * `kubectl exec -ti vault-0 -- vault status`
-  * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
+  * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled and unsealed, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
     * Reschedule vault-2
       * `kubectl delete pod vault-2`
     * Reschedule vault-3
