@@ -3,7 +3,7 @@ server:
   affinity: ""
   ha:
     enabled: false
-    replicas: 6
+    replicas: 10
     raft: 
       enabled: true   
   image:
