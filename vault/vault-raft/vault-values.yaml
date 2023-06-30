@@ -3,11 +3,11 @@ server:
   affinity: ""
   ha:
     enabled: true
-    replicas: 6
+    replicas: 10
     raft: 
       enabled: true   
   image:
     repository: hashicorp/vault-enterprise
-    tag: 1.11.3-ent
+    tag: 1.11.4-ent
   enterpriseLicense:
     secretName: vault-ent-license
