@@ -141,9 +141,9 @@ Note: This lab uses a Minikube Kubernetes cluster
   * `kubectl scale statefulsets vault --replicas=<number_of_replicas>`
 * List Helm releases
   * `helm list <name_of_release>`
-* Get context
+* Get context to view k8s clusters
   * `kubectl config get-contexts`
-* Set context
+* Set context to select k8s cluster to interact with
   * `kubectl config use-context minikube`
 
 # References 
