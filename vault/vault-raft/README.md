@@ -122,6 +122,13 @@ Note: This lab uses a Minikube Kubernetes cluster
   * `kubectl exec -ti vault-0 -- vault read sys/replication/status -format=json`
   * `kubectl exec -ti vault-3 -- vault read sys/replication/status -format=json`
 
+
+## Kubernetes Auth Method
+
+* To run this script, a Vault cluster must be initialized and unsealed 
+* ./k8s_auth.sh
+
+
 # Cleanup
 
 * Run cleanup script to cleanup k8s resources created by Helm chart and PVCs
