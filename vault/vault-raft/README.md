@@ -141,6 +141,10 @@ Note: This lab uses a Minikube Kubernetes cluster
   * `kubectl scale statefulsets vault --replicas=<number_of_replicas>`
 * List Helm releases
   * `helm list <name_of_release>`
+* Get context
+  * `kubectl config get-contexts`
+* Set context
+  * `kubectl config use-context minikube`
 
 # References 
 * https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/ha-with-raft
