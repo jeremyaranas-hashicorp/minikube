@@ -126,7 +126,7 @@ Note: This lab uses a Minikube Kubernetes cluster
 ## Kubernetes Auth Method
 
 * To run this script, a Vault cluster must be initialized and unsealed 
-* ./k8s_auth.sh
+* Refer to k8s_auth.sh
 
 
 # Cleanup
