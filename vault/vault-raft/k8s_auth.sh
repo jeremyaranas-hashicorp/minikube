@@ -69,10 +69,10 @@ VAULT_TOKEN_REVIEW_JWT=$(kubectl get secret vault-auth -o go-template='{{ .data.
 KUBE_CA_CERT=$(kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 --decode)
 
 # Retrieve the k8s host URL
-KUBE_HOST=$(kubectl exec -ti vault-0 -- env | grep KUBERNETES_SERVICE_HOST | cut -d "=" -f2) # Minikube
+KUBE_HOST=$(kubectl exec -ti vault-0 -- env | grep KUBERNETES_SERVICE_HOST | cut -d "=" -f2)
 
 # Configure the k8s auth method to use the vault-auth service account JWT, location of the k8s host and its certificate
-kubectl exec -ti vault-0 -- vault write auth/kubernetes/config token_reviewer_jwt="$VAULT_TOKEN_REVIEW_JWT" kubernetes_host="https://10.96.0.1:443" kubernetes_ca_cert="$KUBE_CA_CERT" disable_local_ca_jwt="false" # Minikube
+kubectl exec -ti vault-0 -- vault write auth/kubernetes/config token_reviewer_jwt="$VAULT_TOKEN_REVIEW_JWT" kubernetes_host="https://10.96.0.1:443" kubernetes_ca_cert="$KUBE_CA_CERT" 
 
 # Read the k8s config
 kubectl exec -ti vault-0 -- vault read auth/kubernetes/config
@@ -102,7 +102,6 @@ k delete sa -n test test-cloud
 k delete namespace test
 k delete sa vault-auth
 k delete clusterrolebindings.rbac.authorization.k8s.io role-tokenreview-binding
-k delete clusterrole system:auth-delegator
 
 
 # Reference(s):
