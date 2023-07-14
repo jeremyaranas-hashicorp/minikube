@@ -105,6 +105,6 @@ k delete clusterrolebindings.rbac.authorization.k8s.io role-tokenreview-binding
 k delete clusterrole system:auth-delegator
 
 
-Reference(s):
+# Reference(s):
 
 * https://support.hashicorp.com/hc/en-us/articles/4404389946387
