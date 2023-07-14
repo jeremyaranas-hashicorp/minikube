@@ -7,8 +7,6 @@
 * Docker
 * `kubectl` CLI installed locally
 
-Note: This lab uses a Minikube Kubernetes cluster
-
 # Install Vault Helm Chart
 
 1. Start Minikube cluster
@@ -41,8 +39,6 @@ Note: This lab uses a Minikube Kubernetes cluster
 14. In another terminal, set up port forwarding to access UI
     1.  `kubectl port-forward vault-0 8200:8200`
     2.  Open http://127.0.0.1:8200 from a browser
-
-# Other Scenarios
 
 ## Upgrades
 
@@ -81,7 +77,7 @@ Note: This lab uses a Minikube Kubernetes cluster
     * `helm ls`
       * Notice that Helm chart version is updated but Vault version is set to version in vault-values.yaml even though chart 0.22.1 maps to app version 1.12.0
   
-* Upgrading Vault via values override file 
+* Upgrade Vault via values override file 
   * Install Vault Helm chart
     * `helm install vault hashicorp/vault --values vault-values.yaml`
   * Run init script 
@@ -112,23 +108,8 @@ Note: This lab uses a Minikube Kubernetes cluster
     * `kubectl exec -ti vault-2 -- vault status`
       * Notice that version has been updated 
   
-  Note that when a pod is rescheduled, it will need to be unsealed.
+Note that when a pod is rescheduled, it will need to be unsealed.
     
-## Enabling Replication (PR)
-
-* Run replication script to enable replication and generate secondary activation token on primary, and enable replication on secondary
-  * `./enable_pr.sh`
-* Check replication status
-  * `kubectl exec -ti vault-0 -- vault read sys/replication/status -format=json`
-  * `kubectl exec -ti vault-3 -- vault read sys/replication/status -format=json`
-
-
-## Kubernetes Auth Method
-
-* To run this script, a Vault cluster must be initialized and unsealed 
-* Refer to k8s_auth.sh
-
-
 # Cleanup
 
 * Run cleanup script to cleanup k8s resources created by Helm chart and PVCs

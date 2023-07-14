@@ -57,7 +57,7 @@ subjects:
 EOF
 
 # Login to Vault
-kubectl exec vault-0 -- vault login $(jq -r ".root_token" cluster-a-keys.json)
+kubectl exec vault-0 -- vault login $(jq -r ".root_token" ../cluster-a-keys.json)
 
 # Enable k8s auth method in Vault
 kubectl exec -ti vault-0 -- vault auth enable kubernetes
@@ -97,13 +97,4 @@ CLIENT_TOKEN_REVIEW_JWT=$(kubectl get secret test-cloud -n test -o go-template='
 # Perform a k8s login using test-cloud service account's JWT and the role
 kubectl exec -ti vault-0 -- curl --request POST --data '{"jwt": "'$CLIENT_TOKEN_REVIEW_JWT'", "role": "devweb-app"}' http://127.0.0.1:8200/v1/auth/kubernetes/login
 
-# Cleanup k8s auth method resources
-k delete sa -n test test-cloud
-k delete namespace test
-k delete sa vault-auth
-k delete clusterrolebindings.rbac.authorization.k8s.io role-tokenreview-binding
-
-
-# Reference(s):
-
-* https://support.hashicorp.com/hc/en-us/articles/4404389946387
+# Reference https://support.hashicorp.com/hc/en-us/articles/4404389946387
