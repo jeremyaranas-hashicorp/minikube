@@ -4,4 +4,4 @@ helm uninstall vault
 kubectl delete pvc -l app.kubernetes.io/instance=vault 
 # Remove files
 rm -f *keys.json
-rm -f sat.txt
+rm -f replication/sat.txt

@@ -21,7 +21,7 @@ From to `vault_agent_injector` directory
    1. APP_JWT=$(k exec -ti <app_pod> -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)
    2. kubectl exec -ti <app_pod> -- curl --request POST --data '{"jwt": "'$APP_JWT'", "role": "internal-app"}' http://127.0.0.1:8200/v1/auth/kubernetes/login
 5. Confirm that secret was injected to app pod
-   1. k exec -ti orgchart-7ff647d464-nk8mh -- cat /vault/secrets/database-config.txt
+   1. k exec -ti <app_pod> -- cat /vault/secrets/database-config.txt
 
 References: 
 

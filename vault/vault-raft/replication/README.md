@@ -1,4 +1,4 @@
-## Enabling Replication (PR)
+## Enabling Replication (PR) 
 
 From `vault-raft` directory
 

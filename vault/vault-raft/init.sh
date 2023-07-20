@@ -2,7 +2,7 @@ echo 'INFO: Starting Raft cluster setup'
 
 # Configure cluster A
 kubectl exec vault-0 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > cluster-a-keys.json
-sleep 15s
+sleep 30
 
 echo 'INFO: vault-0 initialized'
 
@@ -11,6 +11,8 @@ export VAULT_UNSEAL_KEY_CLUSTER_A=$(jq -r ".unseal_keys_b64[]" cluster-a-keys.js
 kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY_CLUSTER_A
 
 echo 'INFO: Unsealed vault-0'
+sleep 15
+
 
 # Add nodes to cluster A
 kubectl exec -ti vault-1 -- vault operator raft join http://vault-0.vault-internal:8200
