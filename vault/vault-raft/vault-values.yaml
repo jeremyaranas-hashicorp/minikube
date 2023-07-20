@@ -8,6 +8,6 @@ server:
       enabled: true   
   image:
     repository: hashicorp/vault-enterprise
-    tag: 1.11.2-ent
+    tag: 1.14.0-ent
   enterpriseLicense:
     secretName: vault-ent-license
