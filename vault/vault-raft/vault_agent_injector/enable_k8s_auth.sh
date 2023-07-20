@@ -5,7 +5,7 @@ kubectl exec -ti vault-0 -- vault write auth/kubernetes/config \
       kubernetes_host="https://10.96.0.1:443"
 # Write policy that enables read for the secrets at path
 kubectl exec -ti vault-0 -- vault policy write internal-app - <<EOF
-path "internal/data/database/config" {
+path "internal/database/config" {
    capabilities = ["read"]
 }
 EOF
