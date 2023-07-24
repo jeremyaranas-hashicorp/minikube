@@ -1,4 +1,4 @@
-## Vault Agent Injector
+# Vault Agent Injector
 
 1. Install Vault Helm chart
    1. `helm install vault hashicorp/vault --values vault-values.yaml`
@@ -18,8 +18,10 @@
 7. Confirm that secret was injected to app pod
    1. `kubectl exec -ti <app_pod> -- cat /vault/secrets/database-config.txt`
 
+* Run cleanup script
+  * `./cleanup.sh`
+
 References: 
 
 https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-sidecar
-
 

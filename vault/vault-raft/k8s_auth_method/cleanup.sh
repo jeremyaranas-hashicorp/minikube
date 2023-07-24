@@ -7,8 +7,10 @@ kubectl exec -ti vault-0 -- vault auth disable kubernetes
 
 # Uninstall Vault Helm chart
 helm uninstall vault
+
 # Remove PVCs
 kubectl delete pvc -l app.kubernetes.io/instance=vault 
+
 # Remove files
 rm -f *keys.json
 rm -f replication/sat.txt

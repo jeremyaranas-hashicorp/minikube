@@ -1,4 +1,4 @@
-## Enabling Replication (PR) 
+# Enabling Replication (PR) 
 
 1. Install Vault Helm chart
    1. `helm install vault hashicorp/vault --values vault-values.yaml`
@@ -9,3 +9,6 @@
 4. Check replication status
    1. `kubectl exec -ti vault-0 -- vault read sys/replication/status -format=json`
    2. `kubectl exec -ti vault-3 -- vault read sys/replication/status -format=json`
+
+* Run cleanup script
+  * `./cleanup.sh`

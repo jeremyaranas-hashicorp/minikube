@@ -79,3 +79,7 @@
   * Check vault status
     * `kubectl exec -ti vault-2 -- vault status`
       * Notice that version has been updated 
+
+* Run cleanup script
+  * `./cleanup.sh`
+

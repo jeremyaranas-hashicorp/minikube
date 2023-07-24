@@ -18,3 +18,7 @@ This is a fork from https://github.com/hashicorp-education/learn-vault-secrets-o
    1. `./create_new_secret.sh`
 8.  Check that secret was updated
     1. `kubectl get secret -n app secretkv -o jsonpath="{.data.password}" | base64 --decode`
+
+* Run cleanup script
+  * `./cleanup.sh`
+
