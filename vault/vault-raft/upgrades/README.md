@@ -1,7 +1,5 @@
 # Upgrades
 
-From `upgrades` directory
-
 * Update Helm chart version
   * Install Vault Helm chart 
     * `helm install vault hashicorp/vault --version 0.21.0 --values vault-values.yaml` 
@@ -16,16 +14,16 @@ From `upgrades` directory
     * `helm upgrade vault hashicorp/vault --version=0.22.1 --values vault-values.yaml` 
   * Check vault status
     * `kubectl exec -ti vault-0 -- vault status`
+  * Set unseal key for unsealing rescheduled pods
+    * `export VAULT_UNSEAL_KEY_CLUSTER_A=$(jq -r ".unseal_keys_b64[]" cluster-a-keys.json)`
   * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled and unsealed, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
     * Reschedule vault-1
       * `kubectl delete pod vault-1`
     * Unseal vault-1
-      * `export VAULT_UNSEAL_KEY_CLUSTER_A=$(jq -r ".unseal_keys_b64[]" cluster-a-keys.json)`
       * `kubectl exec -ti vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY_CLUSTER_A`
     * Reschedule vault-2
       * `kubectl delete pod vault-2`
     * Unseal vault-2
-      * `export VAULT_UNSEAL_KEY_CLUSTER_A=$(jq -r ".unseal_keys_b64[]" cluster-a-keys.json)`
       * `kubectl exec -ti vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY_CLUSTER_A`
     * Confirm that vault-0 is active
       * `kubectl exec -ti vault-0 -- vault status`
@@ -38,7 +36,6 @@ From `upgrades` directory
     * Reschedule vault-0
       * `kubectl delete pod vault-0`
     * Unseal vault-0
-      * `export VAULT_UNSEAL_KEY_CLUSTER_A=$(jq -r ".unseal_keys_b64[]" cluster-a-keys.json)`
       * `kubectl exec -ti vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY_CLUSTER_A`
   * Check Helm chart version
     * `helm ls`
@@ -56,21 +53,21 @@ From `upgrades` directory
     * `helm upgrade vault hashicorp/vault --values vault-values.yaml`
   * Check vault status
     * `kubectl exec -ti vault-0 -- vault status`
+  * Set unseal key for unsealing rescheduled pods
+    * `export VAULT_UNSEAL_KEY_CLUSTER_A=$(jq -r ".unseal_keys_b64[]" cluster-a-keys.json)`
   * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled and unsealed, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
     * Reschedule vault-1
       * `kubectl delete pod vault-1`
     * Unseal vault-1
-      * `export VAULT_UNSEAL_KEY_CLUSTER_A=$(jq -r ".unseal_keys_b64[]" cluster-a-keys.json)`
       * `kubectl exec -ti vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY_CLUSTER_A`
     * Reschedule vault-2
       * `kubectl delete pod vault-2`
     * Unseal vault-2
-      * `export VAULT_UNSEAL_KEY_CLUSTER_A=$(jq -r ".unseal_keys_b64[]" cluster-a-keys.json)`
       * `kubectl exec -ti vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY_CLUSTER_A`
     * Confirm that vault-0 is active
       * `kubectl exec -ti vault-0 -- vault status`
     * Login to Vault
-      * `kubectl exec vault-0 -- vault login $(jq -r ".root_token" cluster-a-keys.json)`
+      * `kubectl exec -ti vault-0 -- vault login $(jq -r ".root_token" cluster-a-keys.json)`
     * Step down active node to transfer leadership
       * `kubectl exec -ti vault-0 -- vault operator step-down`
     * Confirm new leader
@@ -78,7 +75,6 @@ From `upgrades` directory
     * Reschedule vault-0
       * `kubectl delete pod vault-0`
     * Unseal vault-0
-      * `export VAULT_UNSEAL_KEY_CLUSTER_A=$(jq -r ".unseal_keys_b64[]" cluster-a-keys.json)`
       * `kubectl exec -ti vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY_CLUSTER_A`
   * Check vault status
     * `kubectl exec -ti vault-2 -- vault status`
