@@ -5,8 +5,7 @@
 2. Initialize Vault cluster
    1. `./init.sh`
 3. Enable k8s auth method
-   1. `./create_kv_secret.sh`
-   2. `./enable_k8s_auth.sh`
+   1. `./enable_vai.sh`
 4. Deploy app pod
    1. `kubectl apply --filename deployment-orgchart.yaml`
 5. Test k8s auth from vault-0 pod 

@@ -31,3 +31,14 @@ kubectl exec -ti  vault-0 -n vault -- vault write auth/demo-auth-mount/role/role
 # Create a secret in Vault
 kubectl exec -ti  vault-0 -n vault -- vault kv put kvv2/webapp/config username="static-user" password="static-password"
 
+# Install Vault Secrets Operator helm 
+helm install vault-secrets-operator hashicorp/vault-secrets-operator --version 0.1.0 -n vault-secrets-operator-system --create-namespace --values vault-operator-values.yaml
+
+# Create a namespace for the k8s secret
+kubectl create ns app
+
+# Set up k8s auth method for the secret
+kubectl apply -f vault-auth-static.yaml
+
+# Create the secret in the app namespace
+kubectl apply -f static-secret.yaml

@@ -5,7 +5,7 @@
 2. Initialize Vault cluster
    1. `./init.sh`
 3. Set up CSI
-   1. ./csi.sh
+   1. ./enable_csi.sh
 
 * Run cleanup script
   * `./cleanup.sh`
