@@ -1,8 +1,10 @@
 # Upgrades
 
+From `upgrades` directory
+
 * Update Helm chart version
   * Install Vault Helm chart 
-    * `helm install vault hashicorp/vault --version 0.21.0 --values vault-values.yaml --set "server.ha.replicas=3"` 
+    * `helm install vault hashicorp/vault --version 0.21.0 --values vault-values.yaml` 
   * Initialize cluster
     * `./init.sh`
   * Check vault status
@@ -11,7 +13,7 @@
   * Check Helm chart version
     * `helm ls`
   * Update Helm chart version
-    * `helm upgrade vault hashicorp/vault --version=0.22.1 --values vault-values.yaml --set "server.ha.replicas=3"` 
+    * `helm upgrade vault hashicorp/vault --version=0.22.1 --values vault-values.yaml` 
   * Check vault status
     * `kubectl exec -ti vault-0 -- vault status`
   * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled and unsealed, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
@@ -44,14 +46,14 @@
   
 * Upgrade Vault via values override file 
   * Install Vault Helm chart
-    * `helm install vault hashicorp/vault --values vault-values.yaml"`
+    * `helm install vault hashicorp/vault --values vault-values.yaml`
   * Run init script 
     * `./init.sh`
   * Check vault status to get version
     * `kubectl exec -ti vault-0 -- vault status`
   * Edit vault-values.yaml server.image.tag to 1.12.0-ent
   * Run Helm upgrade to deploy new version of Helm chart
-    * `helm upgrade vault hashicorp/vault --values vault-values.yaml --set "server.ha.replicas=3"`
+    * `helm upgrade vault hashicorp/vault --values vault-values.yaml`
   * Check vault status
     * `kubectl exec -ti vault-0 -- vault status`
   * Reschedule pods (always start with the standby pods, once standby pods have been rescheduled and unsealed, run `vault operator step-down` on the active pod to pass leadership, then reschedule active pod)
