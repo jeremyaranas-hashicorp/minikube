@@ -44,7 +44,7 @@
   
 * Upgrade Vault via values override file 
   * Install Vault Helm chart
-    * `helm install vault hashicorp/vault --values vault-values.yaml --set "server.ha.replicas=3"`
+    * `helm install vault hashicorp/vault --values vault-values.yaml"`
   * Run init script 
     * `./init.sh`
   * Check vault status to get version
