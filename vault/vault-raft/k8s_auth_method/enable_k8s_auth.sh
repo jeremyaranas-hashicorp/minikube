@@ -57,7 +57,7 @@ subjects:
 EOF
 
 # Login to Vault
-kubectl exec vault-0 -- vault login $(jq -r ".root_token" ../cluster-a-keys.json)
+kubectl exec vault-0 -- vault login $(jq -r ".root_token" cluster-a-keys.json)
 
 # Enable k8s auth method in Vault
 kubectl exec -ti vault-0 -- vault auth enable kubernetes
