@@ -13,3 +13,5 @@ server:
     secretName: vault-ent-license
 injector:
   enabled: false
+csi:
+  enabled: true
