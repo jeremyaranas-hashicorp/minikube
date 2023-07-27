@@ -14,8 +14,8 @@ rm -f *keys.json
 kubectl delete secrets -n vault vault-ent-license
 
 # Remove secrets
-kubectl delete secrets -n app secretkv
+kubectl delete secrets -n vso test-k8s-secret
 
 # Cleanup namespaces
-kubectl delete ns app vault vault-secrets-operator-system
+kubectl delete ns vault vault-secrets-operator-system vso
 

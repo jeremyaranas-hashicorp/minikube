@@ -1,13 +1,14 @@
 apiVersion: secrets.hashicorp.com/v1beta1
 kind: VaultAuth
 metadata:
-  name: static-auth
-  namespace: app
+  name: app-vault-auth
+  namespace: default
 spec:
   method: kubernetes
-  mount: demo-auth-mount
+  mount: k8s-auth-method
   kubernetes:
-    role: role1
+    role: vso
     serviceAccount: default
-    audiences:
-      - vault
+
+
+

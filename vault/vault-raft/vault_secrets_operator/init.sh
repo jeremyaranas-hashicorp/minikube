@@ -6,7 +6,7 @@ kubectl create secret generic vault-ent-license -n vault --from-literal="license
 
 echo 'INFO: Starting Raft cluster setup'
 
-sleep 15
+sleep 30
 # Configure cluster A
 kubectl exec -ti vault-0 -n vault -- vault operator init -key-shares=1 -key-threshold=1 -format=json > cluster-a-keys.json
 sleep 30
