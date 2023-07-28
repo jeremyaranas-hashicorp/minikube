@@ -1,9 +1,9 @@
 # Login with root token
 kubectl exec vault-0 -- vault login $(jq -r ".root_token" cluster-a-keys.json)
 # Enable secrets engine
-kubectl exec -ti vault-0 -- vault secrets enable -path=internal kv
+kubectl exec -ti vault-0 -- vault secrets enable -path=test kv
 # Add secret
-kubectl exec -ti vault-0 -- vault kv put internal/database/config username="db-readonly-username" password="db-secret-password"
+kubectl exec -ti vault-0 -- vault kv put test/secret/super_secret username="bob" password="1234"
 
 # Enable auth method
 kubectl exec -ti vault-0 -- vault auth enable kubernetes
@@ -11,17 +11,17 @@ kubectl exec -ti vault-0 -- vault auth enable kubernetes
 kubectl exec -ti vault-0 -- vault write auth/kubernetes/config \
       kubernetes_host="https://10.96.0.1:443"
 # Write policy that enables read for the secrets at path
-kubectl exec -ti vault-0 -- vault policy write internal-app - <<EOF
-path "internal/database/config" {
+kubectl exec -ti vault-0 -- vault policy write test-app - <<EOF
+path "test/secret/super_secret" {
    capabilities = ["read"]
 }
 EOF
 
 # Create k8s auth role to connect k8s service account, namespace, Vault policy
-kubectl exec -ti vault-0 -- vault write auth/kubernetes/role/internal-app \
-      bound_service_account_names=internal-app,vault \
+kubectl exec -ti vault-0 -- vault write auth/kubernetes/role/test-app \
+      bound_service_account_names=vault-nginx-sa \
       bound_service_account_namespaces=default \
-      policies=internal-app \
+      policies=test-app \
       ttl=24h
 # Create k8s service account 
-kubectl create sa internal-app
+kubectl create sa vault-nginx-sa

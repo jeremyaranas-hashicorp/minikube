@@ -1,8 +1,8 @@
 # Delete sa
-kubectl delete sa internal-app
+kubectl delete sa vault-nginx-sa
 
 # Delete deployment
-kubectl delete deployment orgchart
+kubectl delete deployment nginx-deployment
 
 # Uninstall Vault Helm chart
 helm uninstall vault
