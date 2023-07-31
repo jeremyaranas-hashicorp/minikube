@@ -41,7 +41,7 @@ login_to_vault () {
 configure_secrets_engine () {
     echo 'INFO: Setting up kv secrets engine'
     kubectl exec -ti vault-0 -- vault secrets enable -path=test kv
-    kubectl exec -ti vault-0 -- vault kv put test/secret username="bob" password="1234"
+    kubectl exec -ti vault-0 -- vault kv put test/secret username="static-username" password="static-password"
 }
 
 configure_k8s_auth () {
