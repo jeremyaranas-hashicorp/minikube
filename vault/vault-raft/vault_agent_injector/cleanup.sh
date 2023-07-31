@@ -1,5 +1,5 @@
 # Delete sa
-kubectl delete sa vault-nginx-sa
+kubectl delete sa test-sa
 
 # Delete deployment
 kubectl delete deployment nginx-deployment
