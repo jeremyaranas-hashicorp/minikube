@@ -6,13 +6,13 @@ helm uninstall csi
 kubectl delete pvc -l app.kubernetes.io/instance=vault 
 
 # Remove files
-rm -f *keys.json
+rm -f init.json
 
 # Remove license
 kubectl delete secrets vault-ent-license
 
 # Remove sa
-kubectl delete sa webapp-sa
+kubectl delete sa test-sa
 
 # Remove secret provider class
-kubectl delete secretproviderclass vault-database
+kubectl delete secretproviderclass test-secretproviderclass

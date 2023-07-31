@@ -1,11 +1,9 @@
 # CSI Provider
 
-1. Install Vault Helm chart
-   1. `helm install vault hashicorp/vault --values vault-values.yaml`
-2. Initialize Vault cluster
-   1. `./init.sh`
-3. Set up CSI
-   1. ./enable_csi.sh
+1. Set up CSI
+   1. `./enable_csi.sh`
+2. Display secret written to the file system on the pod
+   1. `kubectl exec nginx-deployment -- cat /mnt/secrets-store/test-object`
 
 * Run cleanup script
   * `./cleanup.sh`
