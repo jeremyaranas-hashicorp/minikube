@@ -1,6 +1,6 @@
 # Kubernetes Auth Method
 
-1. Enable k8s auth method
+1. Deploy Vault Helm and enable k8s auth method
    1. `./enable_k8s_auth.sh`
 2. Test k8s auth method login using service account JWT
    1. `SA_JWT=$(kubectl get secret test-sa -n test-namespace -o go-template='{{ .data.token }}' | base64 --decode)`
