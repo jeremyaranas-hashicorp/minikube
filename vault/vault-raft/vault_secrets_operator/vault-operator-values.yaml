@@ -7,9 +7,9 @@ defaultVaultConnection:
 
 defaultAuthMethod:
   enabled: true
-  mount: k8s-auth-method
+  mount: kubernetes
   kubernetes:
-    role: vso
+    role: test-role
     serviceAccount: default
     tokenAudiences:
       - https://kubernetes.default.svc.cluster.local

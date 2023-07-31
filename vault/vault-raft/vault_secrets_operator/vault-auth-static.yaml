@@ -5,9 +5,9 @@ metadata:
   namespace: default
 spec:
   method: kubernetes
-  mount: k8s-auth-method
+  mount: kubernetes
   kubernetes:
-    role: vso
+    role: test-role
     serviceAccount: default
 
 

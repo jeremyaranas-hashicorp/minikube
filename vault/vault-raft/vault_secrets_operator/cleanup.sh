@@ -8,7 +8,7 @@ helm uninstall vault-secrets-operator -n vault-secrets-operator-system
 kubectl delete pvc -l app.kubernetes.io/instance=vault -n vault
 
 # Remove files
-rm -f *keys.json
+rm -f init.json
 
 # Remove license
 kubectl delete secrets -n vault vault-ent-license
@@ -18,4 +18,8 @@ kubectl delete secrets -n vso test-k8s-secret
 
 # Cleanup namespaces
 kubectl delete ns vault vault-secrets-operator-system vso
+
+# Cleanup cluster role bindings
+kubectl delete clusterrolebindings token-review-clusterrolebindings
+
 
