@@ -11,3 +11,7 @@ server:
     tag: 1.14.0-ent
   enterpriseLicense:
     secretName: vault-ent-license
+  readinessProbe:
+    initialDelaySeconds: 10
+injector:
+  enabled: false
