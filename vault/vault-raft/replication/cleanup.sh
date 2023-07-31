@@ -5,7 +5,7 @@ helm uninstall vault
 kubectl delete pvc -l app.kubernetes.io/instance=vault 
 
 # Remove files
-rm -f *keys.json
+rm -f init*.json
 rm -f sat.txt
 
 # Remove license

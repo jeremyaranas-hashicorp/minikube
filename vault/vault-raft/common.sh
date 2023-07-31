@@ -38,6 +38,33 @@ login_to_vault () {
     kubectl exec vault-0 -- vault login $(jq -r ".root_token" init.json)
 }
 
+init_vault_2 () {
+    echo 'INFO: Initializing vault-3'
+    sleep 30
+    kubectl exec vault-3 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init-2.json
+    sleep 30
+}
+
+unseal_vault_2 () {
+    echo 'INFO: Unsealing vault-3'
+    export VAULT_UNSEAL_KEY_2=$(jq -r ".unseal_keys_b64[]" init-2.json)
+    kubectl exec vault-3 -- vault operator unseal $VAULT_UNSEAL_KEY_2
+    sleep 15
+}
+
+add_nodes_to_cluster_2 () {
+    echo 'INFO: Adding nodes to cluster'
+    kubectl exec -ti vault-1 -- vault operator raft join http://vault-0.vault-internal:8200
+    kubectl exec -ti vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY_2
+    kubectl exec -ti vault-2 -- vault operator raft join http://vault-0.vault-internal:8200
+    kubectl exec -ti vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY_2
+}
+
+login_to_vault_2 () {
+    echo 'INFO: Logging into Vault'
+    kubectl exec vault-3 -- vault login $(jq -r ".root_token" init-2.json)
+}
+
 configure_secrets_engine () {
     echo 'INFO: Setting up kv secrets engine'
     kubectl exec -ti vault-0 -- vault secrets enable -path=test kv
