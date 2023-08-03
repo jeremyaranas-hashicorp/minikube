@@ -1,0 +1,1 @@
+This lab will deploy Vault running in k8s using the setup.sh script.
