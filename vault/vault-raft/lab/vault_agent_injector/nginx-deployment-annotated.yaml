@@ -14,7 +14,7 @@ spec:
       annotations:
        vault.hashicorp.com/agent-inject: 'true'
        vault.hashicorp.com/role: 'test-app'
-       vault.hashicorp.com/agent-inject-secret-password.txt: 'test/secret'
+       vault.hashicorp.com/agent-inject-secret-password.txt: 'test/data/secret'
       labels:
         app: nginx
     spec:

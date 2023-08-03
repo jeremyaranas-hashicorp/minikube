@@ -4,8 +4,13 @@ set_ent_license
 init_vault
 unseal_vault
 login_to_vault
-configure_secrets_engine
 configure_k8s_auth
+
+configure_secrets_engine () {
+    echo 'INFO: Setting up kv secrets engine'
+    kubectl exec -ti vault-0 -- vault secrets enable -path=test kv-v2
+    kubectl exec -ti vault-0 -- vault kv put test/secret username="static-username" password="static-password"
+}
 
 configure_k8s_auth_role () {
     kubectl exec -ti vault-0 -- vault write auth/kubernetes/role/test-role \
@@ -15,8 +20,22 @@ configure_k8s_auth_role () {
         ttl=24h
 }
 
+
+configure_secrets_engine
 configure_k8s_auth_role
 
+
+set_vault_policy () {
+    echo 'INFO: Writing Vault policy'
+    # Write a Vault policy that enables read for the secrets at specified path
+    kubectl exec -ti vault-0 -- vault policy write test-policy - <<EOF
+        path "test/data/secret" {
+        capabilities = ["read"]
+        }
+EOF
+}
+
+set_vault_policy
+
 source ../../common.sh
-set_vault_policy    
 deploy_app
