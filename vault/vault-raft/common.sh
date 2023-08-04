@@ -13,9 +13,9 @@ set_ent_license () {
 
 init_vault () {
     echo 'INFO: Initializing vault-0'
-    sleep 30
+    sleep 5
     kubectl exec vault-0 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init.json
-    sleep 30
+    sleep 5
 }
 
 unseal_vault () {

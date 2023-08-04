@@ -1,6 +1,13 @@
 source ../../common.sh
 install_vault_helm
 set_ent_license
+
+# Wait for container to start
+while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != "true" ]]; 
+do
+ echo 'Waiting for container to start' 
+done
+
 init_vault
 unseal_vault
 login_to_vault
