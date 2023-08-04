@@ -12,6 +12,12 @@ set_ent_license () {
 }
 
 init_vault () {
+    # Wait for container to start
+    echo 'INFO: Waiting for container to start'
+    while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]] 
+    do
+    sleep 1
+    done
     echo 'INFO: Initializing vault-0'
     sleep 5
     kubectl exec vault-0 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init.json
@@ -22,7 +28,7 @@ unseal_vault () {
     echo 'INFO: Unsealing vault-0'
     export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" init.json)
     kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
-    sleep 15
+    sleep 5
 }
 
 add_nodes_to_cluster () {
@@ -40,7 +46,7 @@ login_to_vault () {
 
 configure_secrets_engine () {
     echo 'INFO: Setting up kv secrets engine'
-    kubectl exec -ti vault-0 -- vault secrets enable -path=test kv
+    kubectl exec -ti vault-0 -- vault secrets enable -path=test kv-v2
     kubectl exec -ti vault-0 -- vault kv put test/secret username="static-username" password="static-password"
 }
 
@@ -55,9 +61,8 @@ configure_k8s_auth () {
 
 set_vault_policy () {
     echo 'INFO: Writing Vault policy'
-    # Write a Vault policy that enables read for the secrets at specified path
     kubectl exec -ti vault-0 -- vault policy write test-policy - <<EOF
-        path "test/secret" {
+        path "test/data/secret" {
         capabilities = ["read"]
         }
 EOF
@@ -96,17 +101,23 @@ set_ent_license_namespace () {
 }
 
 init_vault_namespace () {
+    # Wait for container to start
+    echo 'INFO: Waiting for container to start'
+    while [[ $(kubectl get pods -n vault -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]]; 
+    do
+    sleep 1
+    done
     echo 'INFO: Initializing vault-0'
-    sleep 30
+    sleep 5
     kubectl exec -ti vault-0 -n vault -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init.json
-    sleep 30
+    sleep 5
 }
 
 unseal_vault_namespace () {
     echo 'INFO: Unsealing vault-0'
     export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" init.json)
     kubectl exec -n vault vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
-    sleep 15
+    sleep 5
 }
 
 add_nodes_to_cluster_namespace () {
@@ -125,7 +136,7 @@ login_to_vault_namespace () {
 configure_secrets_engine_namespace () {
     echo 'INFO: Setting up kv secrets engine'
     kubectl exec -ti vault-0 -n vault -- vault secrets enable -path=test kv-v2
-    kubectl exec -ti  vault-0 -n vault -- vault kv put test/secret username="static-username" password="static-password"
+    kubectl exec -ti vault-0 -n vault -- vault kv put test/secret username="static-username" password="static-password"
 
 }
 
@@ -140,9 +151,8 @@ configure_k8s_auth_namespace () {
 
 set_vault_policy_namespace () {
     echo 'INFO: Writing Vault policy'
-    # Write a Vault policy that enables read for the secrets at specified path
     kubectl exec -ti vault-0 -n vault -- vault policy write test-policy - <<EOF
-        path "*" {
+        path "test/data/secret" {
         capabilities = ["read"]
         }
 EOF
@@ -162,17 +172,23 @@ configure_k8s_auth_role_namespace () {
 # Functions to deploy second Vault cluster
 
 init_vault_2 () {
+    # Wait for container to start
+    echo 'INFO: Waiting for container to start'
+    while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]]; 
+    do
+    sleep 1
+    done
     echo 'INFO: Initializing vault-3'
-    sleep 30
+    sleep 5
     kubectl exec vault-3 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init-2.json
-    sleep 30
+    sleep 5
 }
 
 unseal_vault_2 () {
     echo 'INFO: Unsealing vault-3'
     export VAULT_UNSEAL_KEY_2=$(jq -r ".unseal_keys_b64[]" init-2.json)
     kubectl exec vault-3 -- vault operator unseal $VAULT_UNSEAL_KEY_2
-    sleep 15
+    sleep 5
 }
 
 add_nodes_to_cluster_2 () {

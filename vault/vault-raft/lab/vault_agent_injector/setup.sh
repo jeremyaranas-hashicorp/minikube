@@ -1,18 +1,3 @@
-source ../../common.sh
-install_vault_helm
-set_ent_license
-
-# Wait for container to start
-while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != "true" ]]; 
-do
- echo 'Waiting for container to start' 
-done
-
-init_vault
-unseal_vault
-login_to_vault
-configure_k8s_auth
-
 configure_secrets_engine () {
     echo 'INFO: Setting up kv secrets engine'
     kubectl exec -ti vault-0 -- vault secrets enable -path=test kv-v2
@@ -27,14 +12,8 @@ configure_k8s_auth_role () {
         ttl=24h
 }
 
-
-configure_secrets_engine
-configure_k8s_auth_role
-
-
 set_vault_policy () {
     echo 'INFO: Writing Vault policy'
-    # Write a Vault policy that enables read for the secrets at specified path
     kubectl exec -ti vault-0 -- vault policy write test-policy - <<EOF
         path "test/data/secret" {
         capabilities = ["read"]
@@ -42,7 +21,14 @@ set_vault_policy () {
 EOF
 }
 
-set_vault_policy
-
 source ../../common.sh
+install_vault_helm
+set_ent_license
+init_vault
+unseal_vault
+login_to_vault
+configure_k8s_auth
+configure_secrets_engine
+configure_k8s_auth_role
+set_vault_policy
 deploy_app
