@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Cleanup k8s auth method resources
 kubectl delete namespace test-namespace
 kubectl delete sa test-sa

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Uninstall Vault Helm chart
 helm uninstall vault
 

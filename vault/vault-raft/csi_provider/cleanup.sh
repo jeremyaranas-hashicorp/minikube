@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Uninstall Helm charts
 helm uninstall vault
 helm uninstall csi

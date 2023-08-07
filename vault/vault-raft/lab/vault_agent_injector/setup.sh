@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 configure_secrets_engine () {
     echo 'INFO: Setting up kv secrets engine'
     kubectl exec -ti vault-0 -- vault secrets enable -path=test kv-v2

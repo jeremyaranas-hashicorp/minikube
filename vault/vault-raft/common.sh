@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 install_vault_helm () {
     echo "INFO: Installing Vault Helm chart"
     helm install vault hashicorp/vault --values vault-values.yaml

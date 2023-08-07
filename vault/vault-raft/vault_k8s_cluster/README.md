@@ -1,7 +1,7 @@
 # Vault Kubernetes Cluster
 
-1. Start Minikube cluster
-   1. `minikube start`
+1. Start a new Minikube cluster
+   1. `minikube start -p <cluster_name>`
 2. Update user-supplied values file (vault-values.yaml) to override the default values.yaml
 3. Install Vault Helm chart
    1. `helm install vault hashicorp/vault --values vault-values.yaml`
