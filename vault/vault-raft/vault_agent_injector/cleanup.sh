@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Delete sa
 kubectl delete sa test-sa
 

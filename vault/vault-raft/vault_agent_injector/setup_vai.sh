@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 source ../common.sh
 install_vault_helm
 set_ent_license
