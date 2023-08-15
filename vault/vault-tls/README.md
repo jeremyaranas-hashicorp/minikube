@@ -24,5 +24,12 @@ This repo spins up a Vault node in k8s with TLS
 
 8. Go to `https://127.0.0.1:8200` using a browser to confirm Vault UI has HTTPS
 
+9.  Add other nodes to the cluster
+    1.  `k exec -ti vault-1 -n vault-namespace -- vault operator raft join -leader-ca-cert="@/vault/userconfig/vault-server-tls/vault.ca" "https://vault-0.vault-internal:8200"`
+    2.  `k exec -ti vault-1 -n vault-namespace -- vault operator unseal`
+    3.  `k exec -ti vault-2 -n vault-namespace -- vault operator raft join -leader-ca-cert="@/vault/userconfig/vault-server-tls/vault.ca" "https://vault-0.vault-internal:8200"`
+    4.  `k exec -ti vault-2 -n vault-namespace -- vault operator unseal`
+
+
 
 
