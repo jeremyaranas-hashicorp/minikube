@@ -3,9 +3,26 @@ global:
   tlsDisable: false
 server:
   affinity: ""
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      enabled: true
+      config: | 
+        ui = true
+        listener "tcp" {
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          tls_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+          tls_key_file  = "/vault/userconfig/vault-server-tls/vault.key"
+          tls_client_ca_file = "/vault/userconfig/vault-server-tls/vault.ca"
+        }
+        storage "raft" {
+          path = "/vault/data"
+        }
   image:
     repository: hashicorp/vault
-    tag: 1.12.0
+    tag: 1.14.0
   extraEnvironmentVars:
     VAULT_CACERT: /vault/userconfig/vault-server-tls/vault.ca
   volumes:
@@ -17,26 +34,7 @@ server:
     - mountPath: /vault/userconfig/vault-server-tls
       name: userconfig-vault-server-tls
       readOnly: true
-  standalone:
-    enabled: true
-    config: |
-      ui = true
-      listener "tcp" {
-        address = "[::]:8200"
-        cluster_address = "[::]:8201"
-        tls_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
-        tls_key_file  = "/vault/userconfig/vault-server-tls/vault.key"
-        tls_client_ca_file = "/vault/userconfig/vault-server-tls/vault.ca"
-      }
-
-      storage "file" {
-        path = "/vault/data"
-      }
-
-
-
-
-
+  
 
 
 

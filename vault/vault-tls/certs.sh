@@ -21,6 +21,12 @@ DNS.1 = ${SERVICE}
 DNS.2 = ${SERVICE}.${NAMESPACE}
 DNS.3 = ${SERVICE}.${NAMESPACE}.svc
 DNS.4 = ${SERVICE}.${NAMESPACE}.svc.cluster.local
+DNS.5 = vault-0.vault-internal.vault-namespace.svc.cluster.local
+DNS.6 = vault-1.vault-internal.vault-namespace.svc.cluster.local
+DNS.7 = vault-2.vault-internal.vault-namespace.svc.cluster.local
+DNS.8 = vault-0.vault-internal
+DNS.9 = vault-1.vault-internal
+DNS.9 = vault-2.vault-internal
 IP.1 = 127.0.0.1
 EOF
 
