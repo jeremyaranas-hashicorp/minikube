@@ -1,35 +1,36 @@
 This repo spins up a Vault node in k8s with TLS
-1. Start Minikube
 
+1. Start Minikube
 `minikube start`
 
-2. Run `./certs.sh`
-3. Install Vault
+2. Run 
+`./certs.sh`
 
-`helm install -n vault-namespace vault hashicorp/vault --values helm-vault-values.yml`
-
-4. Check that vault-0 is running
-
-`k get pods -n vault-namespace`
-
-5. Init clusters
+3. Init clusters
 `./init.sh`
 
-6. Login to vault-0
-`kubectl exec --stdin=true --tty=true vault-0 -n vault-namespace -- /bin/sh`
+4. Login to vault-0
+`kubectl exec --stdin=true --tty=true vault-0 -n vault -- /bin/sh`
 
-7. In another terminal window, forward port to view Vault in UI
+5. Run
+`vault status`
+`echo $VAULT_ADDR`
 
-`kubectl port-forward vault-0 -n vault-namespace 8200:8200`
+6. Add other nodes to the cluster
+   1. `k exec -ti vault-1 -n vault -- vault operator raft join -leader-ca-cert="@/vault/userconfig/vault-server-tls/vault.ca" "https://vault-0.vault-internal:8200"`
+   2. `k exec -ti vault-1 -n vault -- vault operator unseal`
+   3. 3.  `k exec -ti vault-2 -n vault -- vault operator raft join -leader-ca-cert="@/vault/userconfig/vault-server-tls/vault.ca" "https://vault-0.vault-internal:8200"`
+   4.   `k exec -ti vault-2 -n vault -- vault operator unseal`
 
-8. Go to `https://127.0.0.1:8200` using a browser to confirm Vault UI has HTTPS
 
-9.  Add other nodes to the cluster
-    1.  `k exec -ti vault-1 -n vault-namespace -- vault operator raft join -leader-ca-cert="@/vault/userconfig/vault-server-tls/vault.ca" "https://vault-0.vault-internal:8200"`
-    2.  `k exec -ti vault-1 -n vault-namespace -- vault operator unseal`
-    3.  `k exec -ti vault-2 -n vault-namespace -- vault operator raft join -leader-ca-cert="@/vault/userconfig/vault-server-tls/vault.ca" "https://vault-0.vault-internal:8200"`
-    4.  `k exec -ti vault-2 -n vault-namespace -- vault operator unseal`
 
+
+# NEED TO FIX
+1. In another terminal window, forward port to view Vault in UI
+
+`kubectl port-forward vault-0 -n vault 8200:8200`
+
+1. Go to `https://127.0.0.1:8200` using a browser to confirm Vault UI has HTTPS
 
 
 

@@ -1,5 +1,5 @@
 export SERVICE=vault-server-tls
-export NAMESPACE=vault-namespace
+export NAMESPACE=vault
 export SECRET_NAME=vault-server-tls
 export TMPDIR=/tmp
 export CSR_NAME=vault-csr
