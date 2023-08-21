@@ -130,6 +130,12 @@ add_nodes_to_cluster_namespace () {
     kubectl exec -ti vault-2 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
 }
 
+add_nodes_to_cluster_namespace_retry_join () {
+    echo 'INFO: Adding nodes to cluster'
+    kubectl exec -ti vault-1 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
+    kubectl exec -ti vault-2 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
+}
+
 login_to_vault_namespace () {
     echo 'INFO: Logging into Vault'
     kubectl exec vault-0 -n vault -- vault login $(jq -r ".root_token" init.json)

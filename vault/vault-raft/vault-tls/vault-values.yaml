@@ -17,8 +17,27 @@ server:
           tls_key_file  = "/vault/userconfig/vault-server-tls/vault.key"
           tls_client_ca_file = "/vault/userconfig/vault-server-tls/vault.ca"
         }
+
         storage "raft" {
-          path = "/vault/data"
+            path = "/vault/data"
+              retry_join {
+                leader_api_addr = "https://vault-0.vault-internal:8200"
+                leader_ca_cert_file = "/vault/userconfig/vault-server-tls/vault.ca"
+                leader_client_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+                leader_client_key_file = "/vault/userconfig/vault-server-tls/vault.key"
+          }
+          retry_join {
+            leader_api_addr = "https://vault-1.vault-internal:8200"
+              leader_ca_cert_file = "/vault/userconfig/vault-server-tls/vault.ca"
+              leader_client_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+              leader_client_key_file = "/vault/userconfig/vault-server-tls/vault.key"
+          }
+          retry_join {
+            leader_api_addr = "https://vault-2.vault-internal:8200"
+              leader_ca_cert_file = "/vault/userconfig/vault-server-tls/vault.ca"
+              leader_client_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+              leader_client_key_file = "/vault/userconfig/vault-server-tls/vault.key"
+          }
         }
   image:
     repository: hashicorp/vault
