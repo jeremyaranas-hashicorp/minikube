@@ -16,17 +16,13 @@ This repo spins up a Vault node in k8s with TLS
 `vault status`
 `echo $VAULT_ADDR`
 
-6. Add other nodes to the cluster
+6. Add other nodes to the cluster (need to set up retry_join)
    1. `k exec -ti vault-1 -n vault -- vault operator raft join -leader-ca-cert="@/vault/userconfig/vault-server-tls/vault.ca" "https://vault-0.vault-internal:8200"`
    2. `k exec -ti vault-1 -n vault -- vault operator unseal`
-   3. 3.  `k exec -ti vault-2 -n vault -- vault operator raft join -leader-ca-cert="@/vault/userconfig/vault-server-tls/vault.ca" "https://vault-0.vault-internal:8200"`
-   4.   `k exec -ti vault-2 -n vault -- vault operator unseal`
+   3. `k exec -ti vault-2 -n vault -- vault operator raft join -leader-ca-cert="@/vault/userconfig/vault-server-tls/vault.ca" "https://vault-0.vault-internal:8200"`
+   4. `k exec -ti vault-2 -n vault -- vault operator unseal`
 
-
-
-
-# NEED TO FIX
-1. In another terminal window, forward port to view Vault in UI
+7. In another terminal window, forward port to view Vault in UI
 
 `kubectl port-forward vault-0 -n vault 8200:8200`
 

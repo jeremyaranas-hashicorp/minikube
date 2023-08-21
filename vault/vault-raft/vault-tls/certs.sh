@@ -1,11 +1,16 @@
+# Source https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/standalone-tls
+
+# Export variables
 export SERVICE=vault-server-tls
 export NAMESPACE=vault
 export SECRET_NAME=vault-server-tls
 export TMPDIR=/tmp
 export CSR_NAME=vault-csr
 
+# Create a key for Kubernetes to sign
 openssl genrsa -out ${TMPDIR}/vault.key 2048
 
+# Create a file with the following contents for the CSR
 cat <<EOF >${TMPDIR}/csr.conf
 [req]
 req_extensions = v3_req
@@ -27,11 +32,13 @@ DNS.7 = vault-2.vault-internal
 IP.1 = 127.0.0.1
 EOF
 
+# Create a CSR
 openssl req -new -key ${TMPDIR}/vault.key \
     -subj "/O=system:nodes/CN=system:node:${SERVICE}.${NAMESPACE}.svc" \
     -out ${TMPDIR}/server.csr \
     -config ${TMPDIR}/csr.conf
 
+# Create a file with the following contents to send to Kubernetes
 cat <<EOF >${TMPDIR}/csr.yaml
 apiVersion: certificates.k8s.io/v1
 kind: CertificateSigningRequest
@@ -48,14 +55,22 @@ spec:
   - server auth
 EOF
 
-# k8s 
+# Send the CSR to Kubernetes
 kubectl create -f ${TMPDIR}/csr.yaml
+
+# Approve the CSR in Kubernetes
 kubectl certificate approve ${CSR_NAME}
-kubectl get csr ${CSR_NAME}
+
+# Retrieve the certificate
 serverCert=$(kubectl get csr ${CSR_NAME} -o jsonpath='{.status.certificate}')
+
+# Write the certificate to a file
 echo "${serverCert}" | openssl base64 -d -A -out ${TMPDIR}/vault.crt
-kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 -d > ${TMPDIR}/vault.ca
+
+# Create namespace
 kubectl create namespace ${NAMESPACE}
+
+# Store the key, cert, and Kubernetes CA into Kubernetes secrets
 kubectl create secret generic ${SECRET_NAME} \
     --namespace ${NAMESPACE} \
     --from-file=vault.key=${TMPDIR}/vault.key \
