@@ -67,6 +67,9 @@ serverCert=$(kubectl get csr ${CSR_NAME} -o jsonpath='{.status.certificate}')
 # Write the certificate to a file
 echo "${serverCert}" | openssl base64 -d -A -out ${TMPDIR}/vault.crt
 
+# Set vault.ca
+kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 -d > ${TMPDIR}/vault.ca
+
 # Create namespace
 kubectl create namespace ${NAMESPACE}
 
