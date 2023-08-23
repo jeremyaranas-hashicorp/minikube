@@ -1,9 +1,7 @@
-# Source https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/standalone-tls
-
 # Export variables
-export SERVICE=vault-server-tls
+export SERVICE=vault-tls-certificates
 export NAMESPACE=vault
-export SECRET_NAME=vault-server-tls
+export SECRET_NAME=vault-tls-certificates
 export TMPDIR=/tmp
 export CSR_NAME=vault-csr
 
@@ -67,7 +65,7 @@ serverCert=$(kubectl get csr ${CSR_NAME} -o jsonpath='{.status.certificate}')
 # Write the certificate to a file
 echo "${serverCert}" | openssl base64 -d -A -out ${TMPDIR}/vault.crt
 
-# Set vault.ca
+# Retrieve Kubernetes CA 
 kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 -d > ${TMPDIR}/vault.ca
 
 # Create namespace
