@@ -13,46 +13,47 @@ server:
         listener "tcp" {
           address = "[::]:8200"
           cluster_address = "[::]:8201"
-          tls_cert_file = "/vault/userconfig/vault-tls-certificates/vault.crt"
-          tls_key_file  = "/vault/userconfig/vault-tls-certificates/vault.key"
-          tls_client_ca_file = "/vault/userconfig/vault-tls-certificates/vault.ca"
+          tls_cert_file = "/vault/vault-tls/vault.crt"
+          tls_key_file  = "/vault/vault-tls/vault.key"
+          tls_client_ca_file = "/vault/vault-tls/vault.ca"
+          tls_disable_client_certs = "true"
         }
 
         storage "raft" {
             path = "/vault/data"
               retry_join {
                 leader_api_addr = "https://vault-0.vault-internal:8200"
-                leader_ca_cert_file = "/vault/userconfig/vault-tls-certificates/vault.ca"
-                leader_client_cert_file = "/vault/userconfig/vault-tls-certificates/vault.crt"
-                leader_client_key_file = "/vault/userconfig/vault-tls-certificates/vault.key"
+                leader_ca_cert_file = "/vault/vault-tls/vault.ca"
+                leader_client_cert_file = "/vault/vault-tls/vault.crt"
+                leader_client_key_file = "/vault/vault-tls/vault.key"
           }
             retry_join {
               leader_api_addr = "https://vault-1.vault-internal:8200"
-                leader_ca_cert_file = "/vault/userconfig/vault-tls-certificates/vault.ca"
-                leader_client_cert_file = "/vault/userconfig/vault-tls-certificates/vault.crt"
-                leader_client_key_file = "/vault/userconfig/vault-tls-certificates/vault.key"
+                leader_ca_cert_file = "/vault/vault-tls/vault.ca"
+                leader_client_cert_file = "/vault/vault-tls/vault.crt"
+                leader_client_key_file = "/vault/vault-tls/vault.key"
             }
             retry_join {
               leader_api_addr = "https://vault-2.vault-internal:8200"
-                leader_ca_cert_file = "/vault/userconfig/vault-tls-certificates/vault.ca"
-                leader_client_cert_file = "/vault/userconfig/vault-tls-certificates/vault.crt"
-                leader_client_key_file = "/vault/userconfig/vault-tls-certificates/vault.key"
+                leader_ca_cert_file = "/vault/vault-tls/vault.ca"
+                leader_client_cert_file = "/vault/vault-tls/vault.crt"
+                leader_client_key_file = "/vault/vault-tls/vault.key"
             }
         }
   image:
     repository: hashicorp/vault
     tag: 1.14.0
   extraEnvironmentVars:
-    VAULT_CACERT: /vault/userconfig/vault-tls-certificates/vault.ca
-    VAULT_TLSCERT: /vault/userconfig/vault-tls-certificates/vault.crt
-    VAULT_TLSKEY: /vault/userconfig/vault-tls-certificates/vault.key
+    VAULT_CACERT: /vault/vault-tls/vault.ca
+    VAULT_TLSCERT: /vault/vault-tls/vault.crt
+    VAULT_TLSKEY: /vault/vault-tls/vault.key
   volumes:
     - name: tls-certificates
       secret:
         defaultMode: 420
-        secretName: vault-tls-certificates 
+        secretName: vault-tls 
   volumeMounts:
-    - mountPath: /vault/userconfig/vault-tls-certificates
+    - mountPath: /vault/vault-tls
       name: tls-certificates
       readOnly: true
   

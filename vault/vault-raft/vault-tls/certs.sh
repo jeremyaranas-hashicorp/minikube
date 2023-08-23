@@ -1,7 +1,7 @@
 # Export variables
-export SERVICE=vault-tls-certificates
+export SERVICE=vault-tls
 export NAMESPACE=vault
-export SECRET_NAME=vault-tls-certificates
+export SECRET_NAME=vault-tls
 export TMPDIR=/tmp
 export CSR_NAME=vault-csr
 
