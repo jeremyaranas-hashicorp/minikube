@@ -6,6 +6,12 @@ server:
     replicas: 6
     raft: 
       enabled: true   
+  readinessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=472"
+  livenessProbe:
+    enabled: true 
+    path: "/v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=472"
   image:
     repository: hashicorp/vault-enterprise
     tag: 1.14.0-ent

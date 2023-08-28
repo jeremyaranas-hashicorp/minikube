@@ -11,15 +11,15 @@ unseal_vault_2
 add_nodes_to_cluster_2
 login_to_vault
 
-# Enable replication on primary
-kubectl exec -ti vault-0 -- vault write -f sys/replication/performance/primary/enable
+# # Enable replication on primary
+# kubectl exec -ti vault-0 -- vault write -f sys/replication/dr/primary/enable
 
-# Genrerate secondary activation token
-kubectl exec -ti vault-0 -- vault write sys/replication/performance/primary/secondary-token id=pr_secondary -format=json | jq -r .wrap_info.token > sat.txt
+# # Genrerate secondary activation token
+# kubectl exec -ti vault-0 -- vault write sys/replication/dr/primary/secondary-token id=pr_secondary -format=json | jq -r .wrap_info.token > sat.txt
 
-# Log into vault-3
-source ../common.sh
-login_to_vault_2
+# # Log into vault-3
+# source ../common.sh
+# login_to_vault_2
 
-# Enable replication on secondary
-kubectl exec -ti vault-3 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt)
+# # Enable replication on secondary
+# kubectl exec -ti vault-3 -- vault write sys/replication/dr/secondary/enable token=$(cat sat.txt)

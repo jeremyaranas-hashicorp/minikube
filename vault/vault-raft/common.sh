@@ -195,10 +195,10 @@ unseal_vault_2 () {
 
 add_nodes_to_cluster_2 () {
     echo 'INFO: Adding nodes to cluster'
-    kubectl exec -ti vault-1 -- vault operator raft join http://vault-0.vault-internal:8200
-    kubectl exec -ti vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY_2
-    kubectl exec -ti vault-2 -- vault operator raft join http://vault-0.vault-internal:8200
-    kubectl exec -ti vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY_2
+    kubectl exec -ti vault-4 -- vault operator raft join http://vault-3.vault-internal:8200
+    kubectl exec -ti vault-4 -- vault operator unseal $VAULT_UNSEAL_KEY_2
+    kubectl exec -ti vault-5 -- vault operator raft join http://vault-3.vault-internal:8200
+    kubectl exec -ti vault-5 -- vault operator unseal $VAULT_UNSEAL_KEY_2
 }
 
 login_to_vault_2 () {
