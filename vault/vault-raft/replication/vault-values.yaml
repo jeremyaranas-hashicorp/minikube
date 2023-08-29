@@ -29,12 +29,12 @@ server:
   readinessProbe:
     enabled: true
     path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204&perfstandbyok=true&drsecondarycode=200"
-    initialDelaySeconds: 60
+    initialDelaySeconds: 5
 
   livenessProbe:
     enabled: true
     path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204&perfstandbyok=true&drsecondarycode=200"
-    initialDelaySeconds: 60
+    initialDelaySeconds: 5
   image:
     repository: hashicorp/vault-enterprise
     tag: 1.14.0-ent
