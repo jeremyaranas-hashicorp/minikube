@@ -6,7 +6,7 @@
    1. `./enable_pr.sh`
 3. Check replication status
    1. `kubectl exec -ti vault-0 -- vault read sys/replication/status -format=json`
-   2. `kubectl exec -ti vault-3 -- vault read sys/replication/status -format=json`
+   2. `kubectl exec -ti vault-secondary-0 -- vault read sys/replication/status -format=json`
 
 * Run cleanup script
   * `./cleanup.sh`

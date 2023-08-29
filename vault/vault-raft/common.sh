@@ -176,32 +176,24 @@ configure_k8s_auth_role_namespace () {
 init_vault_2 () {
     # Wait for container to start
     echo 'INFO: Waiting for container to start'
-    while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]]; 
+    while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]] 
     do
     sleep 1
     done
-    echo 'INFO: Initializing vault-3'
+    echo 'INFO: Initializing vault-secondary-0'
     sleep 5
-    kubectl exec vault-3 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init-2.json
+    kubectl exec vault-secondary-0 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init-2.json
     sleep 5
 }
 
 unseal_vault_2 () {
-    echo 'INFO: Unsealing vault-3'
+    echo 'INFO: Unsealing vault-secondary-0'
     export VAULT_UNSEAL_KEY_2=$(jq -r ".unseal_keys_b64[]" init-2.json)
-    kubectl exec vault-3 -- vault operator unseal $VAULT_UNSEAL_KEY_2
+    kubectl exec vault-secondary-0 -- vault operator unseal $VAULT_UNSEAL_KEY_2
     sleep 5
-}
-
-add_nodes_to_cluster_2 () {
-    echo 'INFO: Adding nodes to cluster'
-    kubectl exec -ti vault-4 -- vault operator raft join http://vault-3.vault-internal:8200
-    kubectl exec -ti vault-4 -- vault operator unseal $VAULT_UNSEAL_KEY_2
-    kubectl exec -ti vault-5 -- vault operator raft join http://vault-3.vault-internal:8200
-    kubectl exec -ti vault-5 -- vault operator unseal $VAULT_UNSEAL_KEY_2
 }
 
 login_to_vault_2 () {
     echo 'INFO: Logging into Vault'
-    kubectl exec vault-3 -- vault login $(jq -r ".root_token" init-2.json)
+    kubectl exec vault-secondary-0 -- vault login $(jq -r ".root_token" init-2.json)
 }
