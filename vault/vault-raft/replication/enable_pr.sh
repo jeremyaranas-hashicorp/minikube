@@ -17,12 +17,12 @@ init_vault_2
 unseal_vault_2
 sleep 20
 
-
 # Unseal nodes 
 export VAULT_UNSEAL_KEY_2=$(jq -r ".unseal_keys_b64[]" init-2.json)
 kubectl exec -ti vault-secondary-1 -- vault operator unseal $VAULT_UNSEAL_KEY_2
 kubectl exec -ti vault-secondary-2 -- vault operator unseal $VAULT_UNSEAL_KEY_2
 
+# Log into vault-0
 login_to_vault
 
 # Enable replication on primary
