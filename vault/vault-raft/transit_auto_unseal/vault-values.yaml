@@ -1,0 +1,53 @@
+# vault-values.yaml
+server:
+  affinity: ""
+  ha:
+    enabled: true
+    replicas: 3
+    raft: 
+      enabled: true
+      config: | 
+        ui = true
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+            path = "/vault/data"
+              retry_join {
+                leader_api_addr = "http://vault-0.vault-internal:8200"
+            }
+            retry_join {
+              leader_api_addr = "http://vault-1.vault-internal:8200"
+            }
+            retry_join {
+              leader_api_addr = "http://vault-2.vault-internal:8200"
+            }
+        }
+          
+        seal "transit" {
+          address = "http://vault-auto-unseal-0.vault-auto-unseal-internal:8200"
+          token = "hvs.CAESIMu7Jv12gYQhUnpO3kXtx_SgQbh6soRfGIdkv2moUwp3GiAKHGh2cy55SWR3RDA3Qm8wWXpEVVdMeDlJejloNVAQLg"
+          disable_renewal = "false"
+          key_name = "autounseal"
+          mount_path = "transit/"
+          tls_skip_verify = "true"
+        }   
+  readinessProbe:
+    enabled: false
+    path: "/v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=200"
+    initialDelaySeconds: 5
+
+  livenessProbe:
+    enabled: false
+    path: "/v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=200"
+    initialDelaySeconds: 5
+  image:
+    repository: hashicorp/vault-enterprise
+    tag: 1.14.0-ent
+  enterpriseLicense:
+    secretName: vault-ent-license
+injector:
+  enabled: false
