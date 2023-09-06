@@ -27,6 +27,9 @@ DNS.4 = ${SERVICE}.${NAMESPACE}.svc.cluster.local
 DNS.5 = vault-0.vault-internal
 DNS.6 = vault-1.vault-internal
 DNS.7 = vault-2.vault-internal
+DNS.8 = vault-secondary-0.vault-secondary-internal
+DNS.9 = vault-secondary-1.vault-secondary-internal
+DNS.10 = vault-secondary-2.vault-secondary-internal
 IP.1 = 127.0.0.1
 EOF
 

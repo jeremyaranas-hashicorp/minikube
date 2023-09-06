@@ -94,6 +94,11 @@ install_vault_helm_namespace () {
     helm install vault hashicorp/vault -n vault --create-namespace --values vault-values.yaml
 }
 
+install_vault_helm_namespace_secondary () {
+    echo "INFO: Installing Vault Helm chart"
+    helm install vault-secondary hashicorp/vault -n vault --create-namespace --values vault-values-secondary.yaml
+}
+
 set_ent_license_namespace () {
     echo 'INFO: Setting license'
     # Vault license must be set using the VAULT_LICENSE environment variable
@@ -115,12 +120,33 @@ init_vault_namespace () {
     sleep 5
 }
 
+init_vault_namespace_secondary () {
+    # Wait for container to start
+    echo 'INFO: Waiting for container to start'
+    while [[ $(kubectl get pods -n vault -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]]; 
+    do
+    sleep 1
+    done
+    echo 'INFO: Initializing vault-secondary-0'
+    sleep 5
+    kubectl exec -ti vault-secondary-0 -n vault -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init-secondary.json
+    sleep 5
+}
+
 unseal_vault_namespace () {
-    echo 'INFO: Unsealing vault-0'
+    echo 'INFO: Unsealing vault-secondary-0'
     export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" init.json)
     kubectl exec -n vault vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
     sleep 5
 }
+
+unseal_vault_namespace_secondary () {
+    echo 'INFO: Unsealing vault-secondary-0'
+    export VAULT_UNSEAL_KEY_SECONDARY=$(jq -r ".unseal_keys_b64[]" init-secondary.json)
+    kubectl exec -n vault vault-secondary-0 -- vault operator unseal $VAULT_UNSEAL_KEY_SECONDARY
+    sleep 5
+}
+
 
 add_nodes_to_cluster_namespace () {
     echo 'INFO: Adding nodes to cluster'
