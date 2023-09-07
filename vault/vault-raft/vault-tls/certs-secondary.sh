@@ -1,9 +1,9 @@
 # Export variables
-export SERVICE=vault-tls
-export NAMESPACE=vault
-export SECRET_NAME=vault-tls
+export SERVICE=vault-tls-secondary
+export NAMESPACE=vault-secondary
+export SECRET_NAME=vault-tls-secondary
 export TMPDIR=/tmp
-export CSR_NAME=vault-csr
+export CSR_NAME=vault-csr-secondary
 
 # Create a key for Kubernetes to sign
 openssl genrsa -out ${TMPDIR}/vault.key 2048
@@ -30,9 +30,6 @@ DNS.7 = vault-2.vault-internal
 DNS.8 = vault-secondary-0.vault-secondary-internal
 DNS.9 = vault-secondary-1.vault-secondary-internal
 DNS.10 = vault-secondary-2.vault-secondary-internal
-DNS.11 = vault-active.vault.svc.cluster.local
-DNS.12 = vault-internal.vault.svc
-DNS.13 = vault-internal.vault.svc.cluster.local
 IP.1 = 127.0.0.1
 EOF
 
