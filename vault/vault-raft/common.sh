@@ -142,7 +142,7 @@ init_vault_namespace_secondary () {
 }
 
 unseal_vault_namespace () {
-    echo 'INFO: Unsealing vault-secondary-0'
+    echo 'INFO: Unsealing vault-0'
     export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" init.json)
     kubectl exec -n vault vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
     sleep 5
