@@ -96,7 +96,7 @@ install_vault_helm_namespace () {
 
 install_vault_helm_namespace_secondary () {
     echo "INFO: Installing Vault Helm chart"
-    helm install vault-secondary hashicorp/vault -n vault --create-namespace --values vault-values-secondary.yaml
+    helm install vault-secondary hashicorp/vault -n vault-secondary --create-namespace --values vault-values-secondary.yaml
 }
 
 set_ent_license_namespace () {
@@ -105,6 +105,14 @@ set_ent_license_namespace () {
     # export VAULT_LICENSE="<license_string>"
     secret=$VAULT_LICENSE
     kubectl create secret generic vault-ent-license -n vault --from-literal="license=${secret}"
+}
+
+set_ent_license_namespace_secondary () {
+    echo 'INFO: Setting license'
+    # Vault license must be set using the VAULT_LICENSE environment variable
+    # export VAULT_LICENSE="<license_string>"
+    secret=$VAULT_LICENSE
+    kubectl create secret generic vault-ent-license -n vault-secondary --from-literal="license=${secret}"
 }
 
 init_vault_namespace () {
@@ -123,18 +131,18 @@ init_vault_namespace () {
 init_vault_namespace_secondary () {
     # Wait for container to start
     echo 'INFO: Waiting for container to start'
-    while [[ $(kubectl get pods -n vault -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]]; 
+    while [[ $(kubectl get pods -n vault-secondary -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]]; 
     do
     sleep 1
     done
     echo 'INFO: Initializing vault-secondary-0'
     sleep 5
-    kubectl exec -ti vault-secondary-0 -n vault -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init-secondary.json
+    kubectl exec -ti vault-secondary-0 -n vault-secondary -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init-secondary.json
     sleep 5
 }
 
 unseal_vault_namespace () {
-    echo 'INFO: Unsealing vault-secondary-0'
+    echo 'INFO: Unsealing vault-0'
     export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" init.json)
     kubectl exec -n vault vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
     sleep 5
@@ -143,7 +151,7 @@ unseal_vault_namespace () {
 unseal_vault_namespace_secondary () {
     echo 'INFO: Unsealing vault-secondary-0'
     export VAULT_UNSEAL_KEY_SECONDARY=$(jq -r ".unseal_keys_b64[]" init-secondary.json)
-    kubectl exec -n vault vault-secondary-0 -- vault operator unseal $VAULT_UNSEAL_KEY_SECONDARY
+    kubectl exec -n vault-secondary vault-secondary-0 -- vault operator unseal $VAULT_UNSEAL_KEY_SECONDARY
     sleep 5
 }
 
@@ -159,6 +167,11 @@ add_nodes_to_cluster_namespace () {
 login_to_vault_namespace () {
     echo 'INFO: Logging into Vault'
     kubectl exec vault-0 -n vault -- vault login $(jq -r ".root_token" init.json)
+}
+
+login_to_vault_namespace_secondary () {
+    echo 'INFO: Logging into Vault'
+    kubectl exec vault-secondary-0 -n vault-secondary -- vault login $(jq -r ".root_token" init-secondary.json)
 }
 
 configure_secrets_engine_namespace () {
@@ -263,3 +276,15 @@ init_vault_using_auto_unseal () {
     kubectl exec vault-0 -- vault operator init > init.json
     sleep 5
 }
+
+enable_dr () {
+    login_to_vault_namespace
+    kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/dr/primary/enable
+    kubectl exec -ti -n vault vault-0 -- vault write sys/replication/dr/primary/secondary-token id="dr-secondary" -format=json  | jq -r .wrap_info.token > sat.txt
+    login_to_vault_namespace_secondary
+    kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/dr/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
+}
+
+
+
+

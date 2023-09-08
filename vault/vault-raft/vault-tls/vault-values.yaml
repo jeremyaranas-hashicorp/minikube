@@ -4,12 +4,16 @@ global:
 server:
   affinity: ""
   ha:
+    apiAddr: "https://vault-active.vault.svc.cluster.local:8200"
+    # apiAddr: "https://vault-0.vault-internal.vault.svc.cluster.local:8200"
+    clusterAddr: "https://$(HOSTNAME).vault-internal.vault.svc.cluster.local:8201"
     enabled: true
     replicas: 3
     raft:
       enabled: true
       config: | 
         ui = true
+        service_registration "kubernetes" {}
         listener "tcp" {
           address = "[::]:8200"
           cluster_address = "[::]:8201"
@@ -41,8 +45,10 @@ server:
             }
         }
   image:
-    repository: hashicorp/vault
-    tag: 1.14.0
+    repository: hashicorp/vault-enterprise
+    tag: 1.14.0-ent
+  enterpriseLicense:
+    secretName: vault-ent-license
   extraEnvironmentVars:
     VAULT_CACERT: /vault/vault-tls/vault.ca
     VAULT_TLSCERT: /vault/vault-tls/vault.crt
