@@ -282,7 +282,7 @@ enable_dr () {
     kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/dr/primary/enable
     kubectl exec -ti -n vault vault-0 -- vault write sys/replication/dr/primary/secondary-token id="dr-secondary" -format=json  | jq -r .wrap_info.token > sat.txt
     login_to_vault_namespace_secondary
-    kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/dr/secondary/enable token=$(cat sat.txt)
+    kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/dr/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
 }
 
 
