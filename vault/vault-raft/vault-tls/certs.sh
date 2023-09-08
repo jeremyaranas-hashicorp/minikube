@@ -2,10 +2,10 @@
 export SERVICE=vault-tls
 export NAMESPACE=vault
 export SECRET_NAME=vault-tls
-export TMPDIR=/tmp
+export TMPDIR=/tmp/vault
 export CSR_NAME=vault-csr
 
-
+mkdir -p /tmp/vault
 
 # Create a key for Kubernetes to sign
 openssl genrsa -out ${TMPDIR}/vault.key 2048
