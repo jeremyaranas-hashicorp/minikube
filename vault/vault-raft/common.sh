@@ -14,7 +14,6 @@ set_ent_license () {
 }
 
 init_vault () {
-    # Wait for container to start
     echo 'INFO: Waiting for container to start'
     while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]] 
     do
@@ -72,13 +71,11 @@ EOF
 
 configure_k8s_auth_role () {
     echo "INFO: Configuring k8s auth method role"
-    # Create k8s auth role to connect k8s service account, k8s namespace, Vault policy
     kubectl exec -ti vault-0 -- vault write auth/kubernetes/role/test-role \
         bound_service_account_names=test-sa,vault \
         bound_service_account_namespaces=default,test-namespace \
         policies=test-policy \
         ttl=24h
-    # Create k8s service account
     kubectl create sa test-sa
 }
 
@@ -86,8 +83,6 @@ deploy_app () {
     echo "INFO: Deploying application"
     kubectl apply --filename nginx-deployment.yaml
 }
-
-# Functions to deploy in Vault k8s namespace
 
 install_vault_helm_namespace () {
     echo "INFO: Installing Vault Helm chart"
@@ -116,7 +111,6 @@ set_ent_license_namespace_secondary () {
 }
 
 init_vault_namespace () {
-    # Wait for container to start
     echo 'INFO: Waiting for container to start'
     while [[ $(kubectl get pods -n vault -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]]; 
     do
@@ -129,7 +123,6 @@ init_vault_namespace () {
 }
 
 init_vault_namespace_secondary () {
-    # Wait for container to start
     echo 'INFO: Waiting for container to start'
     while [[ $(kubectl get pods -n vault-secondary -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]]; 
     do
@@ -154,7 +147,6 @@ unseal_vault_namespace_secondary () {
     kubectl exec -n vault-secondary vault-secondary-0 -- vault operator unseal $VAULT_UNSEAL_KEY_SECONDARY
     sleep 5
 }
-
 
 add_nodes_to_cluster_namespace () {
     echo 'INFO: Adding nodes to cluster'
@@ -201,7 +193,6 @@ EOF
 
 configure_k8s_auth_role_namespace () {
     echo "INFO: Configuring k8s auth method role"
-    # Create k8s auth role to connect k8s service account, k8s namespace, Vault policy
     kubectl exec -ti  vault-0 -n vault -- vault write auth/kubernetes/role/test-role \
         bound_service_account_names=default \
         bound_service_account_namespaces="*" \
@@ -210,10 +201,7 @@ configure_k8s_auth_role_namespace () {
         token_policies=test-policy
 }
 
-# Functions to deploy second Vault cluster
-
 init_vault_2 () {
-    # Wait for container to start
     echo 'INFO: Waiting for container to start'
     while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]] 
     do
@@ -237,10 +225,7 @@ login_to_vault_2 () {
     kubectl exec vault-secondary-0 -- vault login $(jq -r ".root_token" init-2.json)
 }
 
-# Functions to deploy Transit auto-unseal Vault cluster
-
 init_vault_auto_unseal () {
-    # Wait for container to start
     echo 'INFO: Waiting for container to start'
     while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]] 
     do
@@ -265,7 +250,6 @@ login_to_vault_auto_unseal () {
 }
 
 init_vault_using_auto_unseal () {
-    # Wait for container to start
     echo 'INFO: Waiting for container to start'
     while [[ $(kubectl get pods -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]] 
     do
