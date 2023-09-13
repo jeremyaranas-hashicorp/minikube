@@ -1,0 +1,26 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: webapp
+spec:
+  serviceAccountName: test-sa
+  containers:
+  - image: curlimages/curl 
+    name: webapp
+    command: [ "sleep", "600" ]
+    volumeMounts:
+    - name: secrets-store-inline
+      mountPath: "/mnt/secrets-store"
+      readOnly: true
+  volumes:
+    - name: secrets-store-inline
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          # Before
+          secretProviderClass: "vault-database"
+          # After
+          # secretProviderClass: "vault-db-creds"
+
+
