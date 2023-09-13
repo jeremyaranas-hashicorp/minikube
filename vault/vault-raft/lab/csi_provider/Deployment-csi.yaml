@@ -28,8 +28,5 @@ spec:
             driver: 'secrets-store.csi.k8s.io'
             readOnly: true
             volumeAttributes:
-              # Before
-              secretProviderClass: "vault-database"
-              # After
-              # secretProviderClass: 'vault-db-creds'
+              secretProviderClass: 'vault-db-creds'
       serviceAccountName: test-sa
