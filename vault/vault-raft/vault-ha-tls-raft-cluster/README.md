@@ -11,10 +11,12 @@ Instructions:
 `minikube start`
 
 2. Initialize primary Vault
-`./init-primary.sh`
+   1. `./certs.sh`
+   2. `./init-primary.sh`
 
 3. Initialize secondary cluster (for replication)
-`./init-secondary.sh`
+   1. `./certs-secondary.sh`
+   2. `./init-secondary.sh`
 
 Options:
 
@@ -28,6 +30,7 @@ Options:
       2. Test login using local JWT from pod
          1. `POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$POD_LOCAL_JWT'", "role": "test-role"}' https://127.0.0.1:8200/v1/auth/kubernetes/login`
+3. Add CSI, VAI, VSO
 
 * Make sure to run the cleanup.sh script to remove old certs when creating a new lab
 

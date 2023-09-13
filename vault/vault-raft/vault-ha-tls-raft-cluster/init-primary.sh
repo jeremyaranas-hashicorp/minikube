@@ -1,5 +1,3 @@
-./certs.sh
-
 source ./common.sh
 
 set_ent_license

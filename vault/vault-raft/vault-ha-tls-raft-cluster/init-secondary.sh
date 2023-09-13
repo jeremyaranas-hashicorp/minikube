@@ -1,7 +1,5 @@
 source ./common.sh
 
-./certs-secondary.sh
-
 set_ent_license_secondary
 install_vault_helm_secondary
 init_vault_secondary
