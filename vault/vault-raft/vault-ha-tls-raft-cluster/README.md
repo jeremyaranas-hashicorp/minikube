@@ -18,8 +18,8 @@ Instructions:
 
 Options:
 
-1. Enable DR replication
-   1. `./enable_dr.sh`
+1. Enable PR replication
+   1. `./enable_pr.sh`
 2. Enable k8s auth
    1. `./enable_k8s_auth.sh`
       1. Test login using long-lived token from service account

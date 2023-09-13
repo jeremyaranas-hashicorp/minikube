@@ -10,6 +10,7 @@ enable_pr () {
 
 
 configure_k8s_auth () {
+    login_to_vault
     echo 'INFO: Configuring k8s auth method'
     kubectl exec -ti -n vault vault-0 -- vault auth enable kubernetes
     # Configure k8s auth method to use the location of the k8s API

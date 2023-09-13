@@ -1,6 +1,6 @@
-source ./common.sh
-
 ./certs.sh
+
+source ./common.sh
 
 set_ent_license
 install_vault_helm
