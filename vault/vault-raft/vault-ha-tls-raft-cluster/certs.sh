@@ -4,6 +4,7 @@ export NAMESPACE=vault
 export SECRET_NAME=vault-tls
 export TMPDIR=/tmp/vault
 export CSR_NAME=vault-csr
+export HELMNAME=vault
 
 mkdir -p /tmp/vault
 
@@ -22,52 +23,11 @@ keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
 subjectAltName = @alt_names
 [alt_names]
-DNS.1 = ${SERVICE}
-DNS.2 = ${SERVICE}.${NAMESPACE}
-DNS.3 = ${SERVICE}.${NAMESPACE}.svc
-DNS.4 = ${SERVICE}.${NAMESPACE}.svc.cluster.local
-DNS.5 = vault-0.vault-internal
-DNS.6 = vault-1.vault-internal
-DNS.7 = vault-2.vault-internal
-DNS.8 = vault-secondary-0.vault-secondary-internal
-DNS.9 = vault-secondary-1.vault-secondary-internal
-DNS.10 = vault-secondary-2.vault-secondary-internal
-DNS.11 = vault-active.vault.svc.cluster.local
-
-
-DNS.12 = *.vault-internal
-DNS.13 = *.vault-internal.vault.svc.cluster.local
-DNS.14 = *.vault
-DNS.15 = *.vault-secondary-internal
-DNS.16 = *.vault-secondary-internal.secondary.svc.cluster.local
-DNS.17 = *.vault-secondary
-DNS.18 = vault-active
-DNS.19 = vault-active.*
-DNS.20 = vault-active.*.svc
-DNS.21 = vault-active.vault.svc.cluster.local  
-DNS.22 = vault
-DNS.23 = vault-secondary
-DNS.24 = vault.vault-active
-DNS.25 = secondary.vault-secondary-active
-DNS.26 = vault-secondary-active
-DNS.27 = vault-secondary-active.secondary.svc.cluster.local. 
-
-DNS.28 = *.vault-secondary-internal
-DNS.29 = *.vault-secondary-internal.secondary.svc.cluster.local
-DNS.30 = *.vault-secondary
-DNS.31 = *.vault-internal
-DNS.32 = *.vault-internal.vault.svc.cluster.local
-DNS.33 = *.vault
-DNS.34 = vault-active
-DNS.35 = vault-active.*
-DNS.36 = vault-active.*.svc
-DNS.37 = vault-active.*.svc.cluster.local
-DNS.38 = vault
-DNS.39 = vault-secondary-active.secondary.svc.cluster.local   
-DNS.40 = vault.vault-active
-DNS.41 = secondary.vault-secondary-active
-DNS.42 = vault-secondary-active
-DNS.43 = vault-active.vault.svc.cluster.local     
+DNS.1 = *.$HELMNAME-internal
+DNS.2 = *.$HELMNAME-internal.$NAMESPACE.svc.cluster.local
+DNS.3 = *.$NAMESPACE
+DNS.4 = *.$NAMESPACE.svc.cluster.local
+DNS.5 = $HELMNAME.$NAMESPACE.svc
 IP.1 = 127.0.0.1
 EOF
 
