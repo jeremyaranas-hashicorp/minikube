@@ -3,6 +3,8 @@ source ./common.sh
 if [ -n "$VAULT_LICENSE" ]; 
     then echo "VAULT_LICENSE environment variable is set" 
     else echo "VAULT_LICENSE environment variable is not set. Exiting script." 
+    exit 1
+     
 fi
 
 set_ent_license
