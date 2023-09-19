@@ -43,7 +43,6 @@ Options:
 
 TODO: Add CSI, VAI
 
-* Make sure to run the cleanup.sh script to remove old certs when creating a new lab
 
 
 
