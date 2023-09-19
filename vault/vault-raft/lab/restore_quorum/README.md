@@ -37,7 +37,7 @@ This lab will review how to restore quorum in a Raft cluster running in k8s
 [
   {
     "id": "vault-0",
-    "address": "https://vault-0.vault-internal.vault.svc.cluster.local:8201",
+    "address": "vault-0.vault-internal.vault.svc.cluster.local:8201",
     "non_voter": false
   }
 ]
@@ -78,13 +78,11 @@ This lab will review how to restore quorum in a Raft cluster running in k8s
 24. Confirm that nodes joined cluster
     1.  `kubectl exec -ti -n vault vault-0 -- vault operator raft list-peers`
 25. Repeat steps 17-22 for each additional standby node
-26. Once each additional standby node has been added, switch leader to another node
-    1.  `kubectl exec -ti -n vault vault-0 -- vault operator step-down`
-27. Exec into vault-0 and re-init
-    1.  `kubectl exec -ti -n vault vault-0 -- /bin/sh`
-28. Remove raft directory and vault.db
-    1.  `rm -fr /vault/data/raft /vault/data/vault.db`
-29. Delete vault-0 to reschedule 
-    1.  `kubectl delete pod -n vault vault-0`
-30. Init, unseal and join vault-0 to cluster
-    1.  `kubectl exec -ti -n vault vault-0 -- vault operator raft join http://<active_node_id>.vault-internal:8200`
+
+```
+➜  vault-ha-tls-raft-cluster git:(main) ✗ k logs -n vault vault-0 | grep recovery
+2023-09-19T19:59:39.451Z [INFO]  storage.raft: raft recovery initiated: recovery_file=peers.json
+2023-09-19T19:59:39.451Z [INFO]  storage.raft: raft recovery found new config: config="{[{Voter vault-0 vault-0.vault-internal.vault.svc.cluster.local:8201}]}"
+2023-09-19T19:59:39.454Z [INFO]  storage.raft: raft recovery deleted peers.json
+2023-09-19T19:59:39.507Z [INFO]  replication.index.perf: checkpoint recovery complete
+```
