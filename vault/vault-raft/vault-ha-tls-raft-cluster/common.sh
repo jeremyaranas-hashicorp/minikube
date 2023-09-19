@@ -8,6 +8,12 @@ enable_pr () {
     kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
 }
 
+configure_secrets_engine () {
+    echo 'INFO: Setting up kv secrets engine'
+    kubectl exec -ti vault-0 -n vault -- vault secrets enable -path=test kv-v2
+    kubectl exec -ti vault-0 -n vault -- vault kv put test/secret username="static-username" password="static-password"
+
+}
 
 configure_k8s_auth () {
     login_to_vault
@@ -31,8 +37,8 @@ EOF
 configure_k8s_auth_role () {
     echo "INFO: Configuring k8s auth method role"
     kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/role/test-role \
-        bound_service_account_names=test-sa,vault \
-        bound_service_account_namespaces=default,vault \
+        bound_service_account_names="*" \
+        bound_service_account_namespaces="*" \
         policies=test-policy \
         ttl=24h
     kubectl create sa test-sa
