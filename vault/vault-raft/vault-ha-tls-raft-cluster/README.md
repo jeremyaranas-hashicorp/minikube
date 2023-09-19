@@ -34,6 +34,10 @@ Options:
    1. `./enable_vso.sh`
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
+      2. Create a new secret 
+         1. `./create_new_secret.sh`
+      3. Check that k8s secret was updated
+         1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
 
 
 
