@@ -6,8 +6,6 @@ export TMPDIR=/tmp/vault-secondary
 export CSR_NAME=vault-csr-secondary
 export HELMNAME=vault-secondary
 
-./cleanup.sh
-
 mkdir -p /tmp/vault-secondary
 
 # Create a key for Kubernetes to sign

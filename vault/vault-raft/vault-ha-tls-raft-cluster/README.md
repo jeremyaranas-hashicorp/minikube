@@ -10,11 +10,14 @@ Instructions:
 1. Start Minikube
 `minikube start`
 
-2. Initialize primary Vault
+2. Cleanup any existing certs in /tmp/vault and /tmp/vault-secondary directory
+   1. `./cleanup.sh` 
+
+3. Initialize primary Vault
    1. `./certs.sh`
    2. `./init-primary.sh`
 
-3. Initialize secondary cluster (for replication)
+4. Initialize secondary cluster (for replication)
    1. `./certs-secondary.sh`
    2. `./init-secondary.sh`
 
@@ -38,8 +41,6 @@ Options:
          1. `./create_new_secret.sh`
       3. Check that k8s secret was updated
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
-
-
 
 TODO: Add CSI, VAI
 

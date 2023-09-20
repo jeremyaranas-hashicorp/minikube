@@ -6,8 +6,6 @@ export TMPDIR=/tmp/vault
 export CSR_NAME=vault-csr
 export HELMNAME=vault
 
-./cleanup.sh
-
 mkdir -p /tmp/vault
 
 # Create a key for Kubernetes to sign
