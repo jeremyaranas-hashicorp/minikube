@@ -61,6 +61,13 @@ server:
     - mountPath: /vault/vault-tls
       name: tls-certificates
       readOnly: true
+  readinessProbe:
+    enabled: false
+    path: '/v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=200'
+  livenessProbe:
+    enabled: false
+    path: '/v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=200'
+
   
 
 
