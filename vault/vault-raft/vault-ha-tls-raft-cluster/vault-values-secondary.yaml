@@ -63,10 +63,10 @@ server:
       readOnly: true
   readinessProbe:
     enabled: false
-    path: '/v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=200'
+    path: '/v1/sys/health?standbyok=true&perfstandbyok=true'
   livenessProbe:
     enabled: false
-    path: '/v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=200'
+    path: '/v1/sys/health?standbyok=true&perfstandbyok=true'
 
   
 
