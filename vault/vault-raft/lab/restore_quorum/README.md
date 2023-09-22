@@ -1,12 +1,9 @@
 This lab will review how to restore quorum in a Raft cluster running in k8s 
 
-1. Start a new Minikube cluster
-   1. `minikube start -p <cluster_name>`
-2. Set `VAULT_LICENSE` environment variable 
-3. Deploy a 3 Vault cluster with 3 replicas
-   1. cd to vault-ha-tls-raft-cluster
-   2. `./certs.sh`
-   3. `./init-primary.sh`
+1. Set `VAULT_LICENSE` environment variable 
+2. Deploy a Vault cluster with 3 replicas
+   1. Go to vault-ha-tls-raft-cluster directory
+   2. Follow steps 1-3 in README.md
 
 # Lab
 
