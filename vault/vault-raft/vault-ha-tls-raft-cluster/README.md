@@ -1,4 +1,4 @@
-This repo spins up a Vault Raft cluster in k8s with TLS enabled
+This repo spins up a Vault Raft cluster in k8s
 
 Sources:
 
@@ -40,7 +40,7 @@ Options:
    1. `./enable_tls.sh`
       1. Unseal each pod once pods are rescheduled
 
-TODO: Add CSI, VAI, TLS
+TODO: Add CSI, VAI
 
 
 
