@@ -7,6 +7,8 @@ if [ -n "$VAULT_LICENSE" ];
      
 fi
 
+kubectl create ns vault
+
 set_ent_license
 install_vault_helm
 init_vault

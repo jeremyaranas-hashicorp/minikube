@@ -6,6 +6,8 @@ if [ -n "$VAULT_LICENSE" ];
     exit 1
 fi
 
+kubectl create ns vault-secondary
+
 set_ent_license_secondary
 install_vault_helm_secondary
 init_vault_secondary
