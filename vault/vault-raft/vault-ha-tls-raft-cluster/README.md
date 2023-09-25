@@ -36,6 +36,9 @@ Options:
          1. `./create_new_secret.sh`
       3. Check that k8s secret was updated
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
+4. Enable TLS
+   1. `./enable_tls.sh`
+      1. Unseal each pod once pods are rescheduled
 
 TODO: Add CSI, VAI, TLS
 
