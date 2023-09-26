@@ -23,7 +23,8 @@ cat <<EOF | kubectl create -f -
 apiVersion: v1  
 kind: ServiceAccount  
 metadata:  
-  name: vault  
+  name: vault 
+  namespace: vault 
 ---  
 apiVersion: v1  
 kind: Secret  
@@ -41,10 +42,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io  
   kind: ClusterRole  
   name: system:auth-delegator  
-subjects:  
-  - kind: ServiceAccount  
-    name: vault
-    namespace: default  
+subjects: 
   - kind: ServiceAccount  
     name: test-sa  
     namespace: vault
