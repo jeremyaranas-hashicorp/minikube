@@ -44,7 +44,6 @@ configure_k8s_auth_role () {
         bound_service_account_namespaces="*" \
         policies=test-policy \
         ttl=24h
-    kubectl create sa -n vault test-sa
 }
 
 login_to_vault () {
