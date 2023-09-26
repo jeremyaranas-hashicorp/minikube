@@ -1,6 +1,8 @@
 global:
   enabled: true
   tlsDisable: true
+csi:  
+  enabled: true
 server:
   affinity: ""
   ha:
