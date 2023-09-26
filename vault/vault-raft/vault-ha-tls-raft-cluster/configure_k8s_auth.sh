@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 source ./common.sh
 
 cat <<EOF | kubectl create -f -  
@@ -49,11 +51,11 @@ kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernet
 # Read the k8s config
 kubectl exec -ti -n vault vault-0 -- vault read auth/kubernetes/config
 
-# Write a policy to associate with the devweb-app role used for login by the test-sa service account
+# Write a policy to associate with the role used for login by the service account
 source ./common.sh
 set_vault_policy
 
-# Associate the role to the test-sa service account and the policy
+# Associate the role to the service account and the policy
 configure_k8s_auth_role
   
 # Reference https://support.hashicorp.com/hc/en-us/articles/4404389946387

@@ -16,4 +16,4 @@ helm install -n vault csi secrets-store-csi-driver/secrets-store-csi-driver \
 kubectl apply --filename test-secretproviderclass.yaml
 
 # Create application pod
-kubectl apply --filename test-app-pod.yaml
+kubectl apply --filename app-pod.yaml

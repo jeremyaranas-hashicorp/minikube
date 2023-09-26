@@ -35,11 +35,11 @@ Options:
 4. Enable CSI Provider
    1. `./configure_csi.sh`
       1. Check that secret exist in app pod 
-         1. `kubectl exec -n vault nginx-deployment -- cat /mnt/secrets-store/test-object`
+         1. `kubectl exec -n vault nginx -- cat /mnt/secrets-store/test-object`
 5. Enable Vault Agent Injector
    1. `./configure_vai.sh`
       1. Check that secret exist in app pod
-         1. `kubectl exec -ti -n vault <app_pod> -- cat /vault/secrets/password.txt`
+         1. `kubectl exec -ti -n vault <web_app> -- cat /vault/secrets/password.txt`
 6. Enable TLS
    1. `./enable_tls.sh`
    2. Unseal each pod once pods start

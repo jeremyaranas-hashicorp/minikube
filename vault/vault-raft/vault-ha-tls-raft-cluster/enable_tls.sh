@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Enable TLS
 
 rm -fr /tmp/vault

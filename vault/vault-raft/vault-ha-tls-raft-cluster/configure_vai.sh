@@ -9,5 +9,5 @@ set_vault_policy
 configure_k8s_auth_role
 
 # Deploy application pod
-kubectl apply --filename nginx-deployment.yaml
+kubectl apply --filename app.yaml
 

@@ -1,4 +1,4 @@
-# Functions for vault and vault-secondary namespaces
+#!/usr/bin/env bash
 
 enable_pr () {
     login_to_vault
@@ -22,8 +22,6 @@ configure_k8s_auth () {
     login_to_vault
     echo 'INFO: Configuring k8s auth method'
     kubectl exec -ti -n vault vault-0 -- vault auth enable kubernetes
-    # Configure k8s auth method to use the location of the k8s API
-    # In Minikube, the kubernetes_host is 10.96.0.1
     kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config \
     kubernetes_host="https://10.96.0.1:443"
 }
@@ -58,8 +56,6 @@ login_to_vault_secondary () {
 
 set_ent_license () {
     echo 'INFO: Setting license'
-    # Vault license must be set using the VAULT_LICENSE environment variable
-    # export VAULT_LICENSE="<license_string>"
     secret=$VAULT_LICENSE
     kubectl create secret generic vault-ent-license -n vault --from-literal="license=${secret}"
 }
@@ -90,8 +86,6 @@ unseal_vault () {
 
 set_ent_license_secondary () {
     echo 'INFO: Setting license'
-    # Vault license must be set using the VAULT_LICENSE environment variable
-    # export VAULT_LICENSE="<license_string>"
     secret=$VAULT_LICENSE
     kubectl create secret generic vault-ent-license -n vault-secondary --from-literal="license=${secret}"
 }
