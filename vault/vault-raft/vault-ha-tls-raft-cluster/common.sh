@@ -23,7 +23,7 @@ configure_k8s_auth () {
     echo 'INFO: Configuring k8s auth method'
     kubectl exec -ti -n vault vault-0 -- vault auth enable kubernetes
     kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config \
-    kubernetes_host="https://10.96.0.1:443"
+    kubernetes_host="https://10.96.0.1:443" disable_local_ca_jwt=false
 }
 
 set_vault_policy () {
