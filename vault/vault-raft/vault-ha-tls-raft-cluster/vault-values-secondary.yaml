@@ -1,11 +1,11 @@
 global:
   enabled: true
-  tlsDisable: false
+  tlsDisable: true
 server:
   affinity: ""
   ha:
-    apiAddr: "https://vault-secondary-active.vault-secondary.svc.cluster.local:8200"
-    clusterAddr: "https://$(HOSTNAME).vault-secondary-internal.vault-secondary.svc.cluster.local:8201"
+    apiAddr: "http://vault-secondary-active.vault-secondary.svc.cluster.local:8200"
+    clusterAddr: "http://$(HOSTNAME).vault-secondary-internal.vault-secondary.svc.cluster.local:8201"
     enabled: true
     replicas: 3
     raft:
@@ -16,57 +16,42 @@ server:
         listener "tcp" {
           address = "[::]:8200"
           cluster_address = "[::]:8201"
-          tls_cert_file = "/vault/vault-tls/vault.crt"
-          tls_key_file  = "/vault/vault-tls/vault.key"
-          tls_client_ca_file = "/vault/vault-tls/vault.ca"
-          tls_disable_client_certs = "true"
+          tls_disable = 1
+
         }
 
         storage "raft" {
             path = "/vault/data"
               retry_join {
-                leader_api_addr = "https://vault-secondary-0.vault-secondary-internal:8200"
-                leader_ca_cert_file = "/vault/vault-tls/vault.ca"
-                leader_client_cert_file = "/vault/vault-tls/vault.crt"
-                leader_client_key_file = "/vault/vault-tls/vault.key"
+                leader_api_addr = "http://vault-secondary-0.vault-secondary-internal:8200"
           }
             retry_join {
-              leader_api_addr = "https://vault-secondary-1.vault-secondary-internal:8200"
-                leader_ca_cert_file = "/vault/vault-tls/vault.ca"
-                leader_client_cert_file = "/vault/vault-tls/vault.crt"
-                leader_client_key_file = "/vault/vault-tls/vault.key"
+              leader_api_addr = "http://vault-secondary-1.vault-secondary-internal:8200"
             }
             retry_join {
-              leader_api_addr = "https://vault-secondary-2.vault-secondary-internal:8200"
-                leader_ca_cert_file = "/vault/vault-tls/vault.ca"
-                leader_client_cert_file = "/vault/vault-tls/vault.crt"
-                leader_client_key_file = "/vault/vault-tls/vault.key"
+              leader_api_addr = "http://vault-secondary-2.vault-secondary-internal:8200"
             }
         }
   image:
     repository: hashicorp/vault-enterprise
-    tag: 1.14.0-ent
+    tag: 1.15.0-ent
   enterpriseLicense:
     secretName: vault-ent-license
-  extraEnvironmentVars:
-    VAULT_CACERT: /vault/vault-tls/vault.ca
-    VAULT_TLSCERT: /vault/vault-tls/vault.crt
-    VAULT_TLSKEY: /vault/vault-tls/vault.key
-  volumes:
-    - name: tls-certificates
-      secret:
-        defaultMode: 420
-        secretName: vault-tls-secondary
-  volumeMounts:
-    - mountPath: /vault/vault-tls
-      name: tls-certificates
-      readOnly: true
   readinessProbe:
     enabled: false
     path: '/v1/sys/health?standbyok=true&perfstandbyok=true'
   livenessProbe:
     enabled: false
     path: '/v1/sys/health?standbyok=true&perfstandbyok=true'
+ui:
+  # Use minikube service command to expose service
+  enabled: true
+  publishNotReadyAddresses: true
+  activeVaultPodOnly: false
+  serviceType: "LoadBalancer"
+  serviceNodePort: null
+  externalPort: 8200
+  targetPort: 8200
 
   
 

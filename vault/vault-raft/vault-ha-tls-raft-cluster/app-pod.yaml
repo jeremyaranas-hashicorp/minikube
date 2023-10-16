@@ -1,7 +1,9 @@
 kind: Pod
 apiVersion: v1
 metadata:
-  name: nginx-deployment
+  name: nginx
+  namespace: vault
+
 spec:
   serviceAccountName: test-sa
   containers:

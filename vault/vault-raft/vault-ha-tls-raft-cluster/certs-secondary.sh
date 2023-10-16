@@ -1,4 +1,5 @@
-# Export variables
+#!/usr/bin/env bash
+
 export SERVICE=vault-tls-secondary
 export NAMESPACE=vault-secondary
 export SECRET_NAME=vault-tls-secondary

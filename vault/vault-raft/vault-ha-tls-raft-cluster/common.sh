@@ -1,11 +1,14 @@
-# Functions for vault and vault-secondary namespaces
+#!/usr/bin/env bash
 
 enable_pr () {
     login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/performance/primary/enable
     kubectl exec -ti -n vault vault-0 -- vault write sys/replication/performance/primary/secondary-token id="secondary" -format=json  | jq -r .wrap_info.token > sat.txt
     login_to_vault_secondary
-    kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
+    # TLS
+    # kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
+    kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) 
+
 }
 
 configure_secrets_engine () {
@@ -19,10 +22,8 @@ configure_k8s_auth () {
     login_to_vault
     echo 'INFO: Configuring k8s auth method'
     kubectl exec -ti -n vault vault-0 -- vault auth enable kubernetes
-    # Configure k8s auth method to use the location of the k8s API
-    # In Minikube, the kubernetes_host is 10.96.0.1
     kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config \
-    kubernetes_host="https://10.96.0.1:443"
+    kubernetes_host="https://10.96.0.1:443" disable_local_ca_jwt=false
 }
 
 set_vault_policy () {
@@ -37,11 +38,10 @@ EOF
 configure_k8s_auth_role () {
     echo "INFO: Configuring k8s auth method role"
     kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/role/test-role \
-        bound_service_account_names="*" \
-        bound_service_account_namespaces="*" \
+        bound_service_account_names="vault,test-sa,default" \
+        bound_service_account_namespaces="vault,vso" \
         policies=test-policy \
         ttl=24h
-    kubectl create sa test-sa
 }
 
 login_to_vault () {
@@ -56,8 +56,6 @@ login_to_vault_secondary () {
 
 set_ent_license () {
     echo 'INFO: Setting license'
-    # Vault license must be set using the VAULT_LICENSE environment variable
-    # export VAULT_LICENSE="<license_string>"
     secret=$VAULT_LICENSE
     kubectl create secret generic vault-ent-license -n vault --from-literal="license=${secret}"
 }
@@ -88,8 +86,6 @@ unseal_vault () {
 
 set_ent_license_secondary () {
     echo 'INFO: Setting license'
-    # Vault license must be set using the VAULT_LICENSE environment variable
-    # export VAULT_LICENSE="<license_string>"
     secret=$VAULT_LICENSE
     kubectl create secret generic vault-ent-license -n vault-secondary --from-literal="license=${secret}"
 }

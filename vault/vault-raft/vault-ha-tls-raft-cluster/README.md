@@ -1,4 +1,4 @@
-This repo spins up a Vault Raft cluster in k8s with TLS enabled
+This repo spins up a Vault Raft cluster in k8s
 
 Sources:
 
@@ -8,42 +8,41 @@ Sources:
 Instructions: 
 
 1. Start Minikube
-`minikube start`
+   1. `minikube start`
 
-2. Cleanup any existing certs in /tmp/vault and /tmp/vault-secondary directory
-   1. `./cleanup.sh` 
+2. Initialize primary cluster
+   1. `./init-primary.sh`
 
-3. Initialize primary Vault
-   1. `./certs.sh`
-   2. `./init-primary.sh`
-
-4. Initialize secondary cluster (for replication)
-   1. `./certs-secondary.sh`
-   2. `./init-secondary.sh`
+3. Initialize secondary cluster
+   1. `./init-secondary.sh`
 
 Options:
 
 1. Enable Performance Replication
-   1. `./enable_pr.sh`
+   1. `./configure_pr.sh`
 2. Enable Kubernetes Authentication Method
-   1. `./enable_k8s_auth.sh`
+   1. `./configure_k8s_auth.sh`
       1. Test login using long-lived token from service account
          1. `SA_JWT=$(kubectl get secret test-sa -n vault -o go-template='{{ .data.token }}' | base64 --decode)`   
-         2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$SA_JWT'", "role": "test-role"}' https://127.0.0.1:8200/v1/auth/kubernetes/login`
+         2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$SA_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
       2. Test login using local JWT from pod
          1. `POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
-         2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$POD_LOCAL_JWT'", "role": "test-role"}' https://127.0.0.1:8200/v1/auth/kubernetes/login`
+         2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
 3. Enable Vault Secrets Operator
-   1. `./enable_vso.sh`
+   1. `./configure_vso.sh`
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
-      2. Create a new secret 
-         1. `./create_new_secret.sh`
-      3. Check that k8s secret was updated
-         1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
-
-TODO: Add CSI, VAI
-
+4. Enable CSI Provider
+   1. `./configure_csi.sh`
+      1. Check that secret exist in app pod 
+         1. `kubectl exec -n vault nginx -- cat /mnt/secrets-store/test-object`
+5. Enable Vault Agent Injector
+   1. `./configure_vai.sh`
+      1. Check that secret exist in app pod
+         1. `kubectl exec -ti -n vault <web_app> -- cat /vault/secrets/password.txt`
+6. Enable TLS
+   1. `./enable_tls.sh`
+   2. Unseal each pod once pods start
 
 
 

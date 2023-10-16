@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 source ./common.sh
 
 if [ -n "$VAULT_LICENSE" ]; 
@@ -6,6 +8,8 @@ if [ -n "$VAULT_LICENSE" ];
     exit 1
      
 fi
+
+kubectl create ns vault
 
 set_ent_license
 install_vault_helm

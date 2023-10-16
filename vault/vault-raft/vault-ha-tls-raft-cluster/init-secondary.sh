@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 source ./common.sh
 
 if [ -n "$VAULT_LICENSE" ]; 
@@ -5,6 +7,8 @@ if [ -n "$VAULT_LICENSE" ];
     else echo "VAULT_LICENSE environment variable is not set. Exiting script." 
     exit 1
 fi
+
+kubectl create ns vault-secondary
 
 set_ent_license_secondary
 install_vault_helm_secondary
