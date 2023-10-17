@@ -40,6 +40,9 @@ Options:
    1. `./configure_vai.sh`
       1. Check that secret exist in app pod
          1. `kubectl exec -ti -n vault <web_app> -- cat /vault/secrets/password.txt`
+      2. Check k8s auth method auto-auth in app pod
+         1. `kubectl exec -ti -n vault web-app-<pod> -c vault-agent -- sh`
+         2. `cat /home/vault/config.json`
 6. Enable TLS
    1. `./enable_tls.sh`
    2. Unseal each pod once pods start
