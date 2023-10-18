@@ -2,46 +2,78 @@
 
 enable_pr () {
     login_to_vault
-    kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/performance/primary/enable
-    kubectl exec -ti -n vault vault-0 -- vault write sys/replication/performance/primary/secondary-token id="secondary" -format=json  | jq -r .wrap_info.token > sat.txt
-    login_to_vault_secondary
-    # TLS
-    # kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
-    kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) 
-
+    kubectl exec -ti -n vault vault-0 -- vault read sys/replication/status -format=json | jq .data.performance.mode | grep -q primary
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: PR is already configured" 
+    else 
+        echo "INFO: Enabling PR" 
+        kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/performance/primary/enable
+        kubectl exec -ti -n vault vault-0 -- vault write sys/replication/performance/primary/secondary-token id="secondary" -format=json  | jq -r .wrap_info.token > sat.txt
+        login_to_vault_secondary
+        # TLS
+        # kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
+        kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) 
+    fi
 }
 
 configure_secrets_engine () {
-    echo 'INFO: Setting up kv secrets engine'
-    kubectl exec -ti vault-0 -n vault -- vault secrets enable -path=test kv-v2
-    kubectl exec -ti vault-0 -n vault -- vault kv put test/secret username="static-username" password="static-password"
-
+    login_to_vault
+    kubectl exec -ti -n vault vault-0 -- vault secrets list | grep -q test
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: Secrets engine test is already configured" 
+    else 
+        echo 'INFO: Setting up kv secrets engine test'
+        kubectl exec -ti vault-0 -n vault -- vault secrets enable -path=test kv-v2
+        kubectl exec -ti vault-0 -n vault -- vault kv put test/secret username="static-username" password="static-password"
+    fi
 }
 
 configure_k8s_auth () {
     login_to_vault
-    echo 'INFO: Configuring k8s auth method'
-    kubectl exec -ti -n vault vault-0 -- vault auth enable kubernetes
-    kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config \
-    kubernetes_host="https://10.96.0.1:443" disable_local_ca_jwt=false
+    kubectl exec -ti -n vault vault-0 -- vault auth list | grep -q kubernetes
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: k8s auth is already enabled" 
+    else 
+        echo 'INFO: Configuring k8s auth method'
+        kubectl exec -ti -n vault vault-0 -- vault auth enable kubernetes
+        kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config \
+        kubernetes_host="https://10.96.0.1:443" disable_local_ca_jwt=false 
+    fi
 }
 
 set_vault_policy () {
-    echo 'INFO: Writing Vault policy'
-    kubectl exec -ti -n vault vault-0 -- vault policy write test-policy - <<EOF
-        path "test/data/secret" {
-        capabilities = ["read"]
-        }
+    login_to_vault
+    kubectl exec -ti -n vault vault-0 -- vault policy list | grep -q test-policy
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: test-policy already exists" 
+    else 
+        echo 'INFO: Writing Vault policy'
+        kubectl exec -ti -n vault vault-0 -- vault policy write test-policy - <<EOF
+            path "test/data/secret" {
+            capabilities = ["read"]
+            }
 EOF
+fi
 }
 
 configure_k8s_auth_role () {
-    echo "INFO: Configuring k8s auth method role"
-    kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/role/test-role \
+    login_to_vault
+    kubectl exec -ti -n vault vault-0 -- vault list auth/kubernetes/role | grep -q test-role
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: k8s auth role already exists" 
+    else 
+        echo "INFO: Configuring k8s auth method role"
+        kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/role/test-role \
         bound_service_account_names="vault,test-sa,default" \
         bound_service_account_namespaces="vault,vso" \
         policies=test-policy \
         ttl=24h
+    fi
 }
 
 login_to_vault () {
@@ -55,14 +87,38 @@ login_to_vault_secondary () {
 }
 
 set_ent_license () {
-    echo 'INFO: Setting license'
-    secret=$VAULT_LICENSE
-    kubectl create secret generic vault-ent-license -n vault --from-literal="license=${secret}"
+    kubectl get secrets -n vault | grep -q vault-ent-license
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: Vault license already exist" 
+    else 
+        echo 'INFO: Setting license'
+        secret=$VAULT_LICENSE
+        kubectl create secret generic vault-ent-license -n vault --from-literal="license=${secret}"
+    fi
+}
+
+set_ent_license_secondary () {
+    kubectl get secrets -n vault-secondary | grep -q vault-ent-license
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: Vault license already exist" 
+    else 
+        echo 'INFO: Setting license'
+        secret=$VAULT_LICENSE
+        kubectl create secret generic vault-ent-license -n vault-secondary --from-literal="license=${secret}"
+    fi
 }
 
 install_vault_helm () {
-    echo "INFO: Installing Vault Helm chart"
-    helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_value_files/vault-values.yaml
+    helm ls -n vault | grep -q vault
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: Vault Helm chart already deployed" 
+    else 
+        echo "INFO: Installing Vault Helm chart"
+        helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_value_files/vault-values.yaml
+    fi
 }
 
 init_vault () {
@@ -84,15 +140,15 @@ unseal_vault () {
     sleep 5
 }
 
-set_ent_license_secondary () {
-    echo 'INFO: Setting license'
-    secret=$VAULT_LICENSE
-    kubectl create secret generic vault-ent-license -n vault-secondary --from-literal="license=${secret}"
-}
-
 install_vault_helm_secondary () {
-    echo "INFO: Installing Vault Helm chart"
-    helm install vault-secondary hashicorp/vault -n vault-secondary --create-namespace --values ../helm_chart_value_files/vault-values-secondary.yaml
+    helm ls -n vault | grep -q vault
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: Vault Helm chart already deployed" 
+    else 
+        echo "INFO: Installing Vault Helm chart"
+        helm install vault-secondary hashicorp/vault -n vault-secondary --create-namespace --values ../helm_chart_value_files/vault-values-secondary.yaml
+    fi
 }
 
 init_vault_secondary () {

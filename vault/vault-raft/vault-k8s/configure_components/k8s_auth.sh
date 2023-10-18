@@ -2,6 +2,12 @@
 
 source ../main/common.sh
 
+kubectl get sa -n vault | grep -q test-sa
+if [ $? -eq 0 ] 
+then 
+  echo "INFO: test-sa service account already exist" 
+else 
+  echo "INFO: Creating service account test-sa" 
 cat <<EOF | kubectl create -f -  
 ---  
 apiVersion: v1
@@ -13,13 +19,20 @@ metadata:
 apiVersion: v1  
 kind: Secret  
 metadata:  
- name: test-sa  
- namespace: vault
- annotations:  
-   kubernetes.io/service-account.name: test-sa  
-type: kubernetes.io/service-account-token  
+  name: test-sa  
+  namespace: vault
+  annotations:  
+    kubernetes.io/service-account.name: test-sa  
+    type: kubernetes.io/service-account-token  
 EOF
+fi
 
+kubectl get clusterrolebindings.rbac.authorization.k8s.io | grep -q token-review-clusterrolebindings
+if [ $? -eq 0 ] 
+then 
+  echo "INFO: token-review-clusterrolebindings ClusterRoleBinding already exist" 
+else 
+  echo "INFO: Creating ClusterRoleBinding" 
 cat <<EOF | kubectl create -f -  
 ---  
 apiVersion: rbac.authorization.k8s.io/v1  
@@ -34,7 +47,11 @@ subjects:
   - kind: ServiceAccount  
     name: test-sa  
     namespace: vault
+  - kind: ServiceAccount  
+    name: default
+    namespace: vso
 EOF
+fi
 
 source ../main/common.sh
 configure_k8s_auth
