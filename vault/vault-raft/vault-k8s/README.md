@@ -32,7 +32,7 @@ Options:
       2. Test login using local JWT from pod
          1. `POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
-3. Enable Vault Secrets Operator (need to fix)
+3. Enable Vault Secrets Operator (works if run before enable k8s_auth.sh)
    1. `./vso.sh`
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
