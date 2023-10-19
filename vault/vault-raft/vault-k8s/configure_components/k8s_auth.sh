@@ -2,30 +2,8 @@
 
 source ../main/common.sh
 
-kubectl get sa -n vault | grep -q test-sa
-if [ $? -eq 0 ] 
-then 
-  echo "INFO: test-sa service account already exist" 
-else 
-  echo "INFO: Creating service account test-sa" 
-cat <<EOF | kubectl create -f -  
----  
-apiVersion: v1
-kind: ServiceAccount  
-metadata:  
-  name: test-sa  
-  namespace: vault
----  
-apiVersion: v1  
-kind: Secret  
-metadata:  
-  name: test-sa  
-  namespace: vault
-  annotations:  
-    kubernetes.io/service-account.name: test-sa  
-    type: kubernetes.io/service-account-token  
-EOF
-fi
+create_service_account
+create_secret
 
 kubectl get clusterrolebindings.rbac.authorization.k8s.io | grep -q token-review-clusterrolebindings
 if [ $? -eq 0 ] 

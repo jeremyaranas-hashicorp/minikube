@@ -169,3 +169,25 @@ unseal_vault_secondary () {
     kubectl exec -n vault-secondary vault-secondary-0 -- vault operator unseal $VAULT_UNSEAL_KEY_SECONDARY
     sleep 5
 }
+
+create_service_account () {
+    kubectl get sa -n vault | grep -q test-sa
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: test-sa service account already exist" 
+    else 
+        echo "INFO: Creating service account test-sa" 
+        kubectl apply -f ../manifests/service_account.yaml
+    fi
+}
+
+create_secret () {
+    kubectl get secret -n vault | grep -q test-sa
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: test-sa secret already exist" 
+    else 
+        echo "INFO: Creating secret test-sa"
+        kubectl apply -f ../manifests/secret.yaml 
+    fi
+}

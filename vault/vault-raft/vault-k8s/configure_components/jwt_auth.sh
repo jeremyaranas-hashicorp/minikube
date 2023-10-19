@@ -2,13 +2,12 @@
 
 # This script will configure JWT auth using k8s as an OIDC provider
 
-# Requires test-sa to be created from k8s_auth.sh
-
 # Reference https://developer.hashicorp.com/vault/docs/auth/jwt/oidc-providers/kubernetes
 
 # Login to Vault
 source ../main/common.sh
 login_to_vault
+create_service_account
 
 # Ensure OIDC discovery URLs 
 kubectl create clusterrolebinding oidc-reviewer  \

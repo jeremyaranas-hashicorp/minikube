@@ -22,7 +22,7 @@ Options:
 
 `cd` to **configure_components** directory
 
-1. Enable Performance Replication
+1. Enable Performance Replication (need to test)
    1. `./pr.sh`
 2. Enable Kubernetes Authentication Method
    1. `./k8s_auth.sh`
@@ -32,7 +32,7 @@ Options:
       2. Test login using local JWT from pod
          1. `POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
-3. Enable Vault Secrets Operator
+3. Enable Vault Secrets Operator (need to fix)
    1. `./vso.sh`
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
@@ -40,8 +40,9 @@ Options:
    1. `./csi_provider.sh`
       1. Check that secret exist in app pod 
          1. `kubectl exec -n vault nginx -- cat /mnt/secrets-store/test-object`
-5. Enable Vault Agent Injector
-   1. `./vai.sh`
+5. Enable Vault Agent Injector 
+   1. `./jwt_auth.sh`
+   2. `./vai.sh`
       1. Check that secret exist in app pod
          1. `kubectl exec -ti -n vault web-app-<pod> -- cat /vault/secrets/password.txt`
       2. Check that auto_auth was configured in app pod for k8s auth (requires updating app.yaml annotations for k8s auth auto-auth)
@@ -50,15 +51,12 @@ Options:
       3. Check that auto_auth was configured in app pod for jwt auth (requires updating app.yaml annotations for jwt auth auto-auth)
          1. `kubectl exec -ti -n vault web-app-<pod> -c vault-agent -- sh`
          2. `cat /home/vault/config.json`
-6. Enable TLS
+6. Enable TLS (need to test)
    1. `cd` to **tls** directory
    2. `./enable_tls.sh`
    3. Unseal each pod once pods start
 
 # TO:DO
-
-K8s auth
-Error from server (AlreadyExists): error when creating "STDIN": secrets "test-sa" already exists
 
 VSO
 Error: INSTALLATION FAILED: cannot re-use a name that is still in use
