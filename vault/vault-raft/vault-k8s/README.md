@@ -44,7 +44,10 @@ Options:
    1. `./vai.sh`
       1. Check that secret exist in app pod
          1. `kubectl exec -ti -n vault web-app-<pod> -- cat /vault/secrets/password.txt`
-      2. Check that auto_auth was configured in app pod
+      2. Check that auto_auth was configured in app pod for k8s auth (requires updating app.yaml annotations for k8s auth auto-auth)
+         1. `kubectl exec -ti -n vault web-app-<pod> -c vault-agent -- sh`
+         2. `cat /home/vault/config.json`
+      3. Check that auto_auth was configured in app pod for jwt auth (requires updating app.yaml annotations for jwt auth auto-auth)
          1. `kubectl exec -ti -n vault web-app-<pod> -c vault-agent -- sh`
          2. `cat /home/vault/config.json`
 6. Enable TLS
@@ -52,9 +55,15 @@ Options:
    2. `./enable_tls.sh`
    3. Unseal each pod once pods start
 
+# TO:DO
 
+K8s auth
+Error from server (AlreadyExists): error when creating "STDIN": secrets "test-sa" already exists
 
+VSO
+Error: INSTALLATION FAILED: cannot re-use a name that is still in use
+Error from server (AlreadyExists): namespaces "vso" already exists
 
-
-
-
+CSI
+"secrets-store-csi-driver" already exists with the same configuration, skipping
+Error: INSTALLATION FAILED: cannot re-use a name that is still in use
