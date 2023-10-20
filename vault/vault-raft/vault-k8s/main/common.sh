@@ -31,17 +31,10 @@ configure_secrets_engine () {
 }
 
 configure_k8s_auth () {
-    login_to_vault
-    kubectl exec -ti -n vault vault-0 -- vault auth list | grep -q kubernetes
-    if [ $? -eq 0 ] 
-    then 
-        echo "INFO: k8s auth is already enabled" 
-    else 
-        echo 'INFO: Configuring k8s auth method'
-        kubectl exec -ti -n vault vault-0 -- vault auth enable kubernetes
-        kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config \
-        kubernetes_host="https://10.96.0.1:443" disable_local_ca_jwt=false 
-    fi
+    echo 'INFO: Configuring k8s auth method'
+    kubectl exec -ti -n vault vault-0 -- vault auth enable kubernetes
+    kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config \
+    kubernetes_host="https://10.96.0.1:443" disable_local_ca_jwt=false
 }
 
 set_vault_policy () {

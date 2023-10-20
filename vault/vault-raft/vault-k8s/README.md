@@ -32,7 +32,7 @@ Options:
       2. Test login using local JWT from pod
          1. `POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
-3. Enable Vault Secrets Operator (works if run before enable k8s_auth.sh)
+3. Enable Vault Secrets Operator
    1. `./vso.sh`
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
@@ -59,10 +59,7 @@ Options:
 
 # TO:DO
 
-VSO
-Error: INSTALLATION FAILED: cannot re-use a name that is still in use
-Error from server (AlreadyExists): namespaces "vso" already exists
-
-CSI
-"secrets-store-csi-driver" already exists with the same configuration, skipping
-Error: INSTALLATION FAILED: cannot re-use a name that is still in use
+Create if statement to check if VSO namespace exist
+Create if statement to check if VSO Helm chart is already installed 
+Create if statement to check if CSI Helm chart is already installed
+Move `vault auth enable kubernetes` outside of configure_k8s_auth function and create if statement to check if k8s auth is already enabled
