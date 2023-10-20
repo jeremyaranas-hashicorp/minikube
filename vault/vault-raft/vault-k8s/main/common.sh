@@ -141,7 +141,7 @@ unseal_vault () {
 }
 
 install_vault_helm_secondary () {
-    helm ls -n vault | grep -q vault
+    helm ls -n vault-secondary | grep -q vault
     if [ $? -eq 0 ] 
     then 
         echo "INFO: Vault Helm chart already deployed" 

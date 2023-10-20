@@ -3,9 +3,12 @@
 source ../main/common.sh
 
 login_to_vault
+# Also in k8s_auth.sh
 configure_k8s_auth
 configure_secrets_engine
+# Also in k8s_auth.sh
 set_vault_policy
+# Also in k8s_auth.sh
 configure_k8s_auth_role
 
 # Install Vault Secrets Operator Helm chart 

@@ -25,9 +25,6 @@ subjects:
   - kind: ServiceAccount  
     name: test-sa  
     namespace: vault
-  - kind: ServiceAccount  
-    name: default
-    namespace: vso
 EOF
 fi
 
