@@ -41,8 +41,10 @@ Options:
       1. Check that secret exist in app pod 
          1. `kubectl exec -n vault nginx -- cat /mnt/secrets-store/test-object`
 5. Enable JWT auth method
-   1. `./jwt_auth.sh`
-6. Enable Vault Agent Injector (requires jwt_auth.sh) 
+   1. To test jwt login from Vault pod, uncomment `Create role to test JWT auth login from Vault pod using auto-auth` and `Login using JWT auth from Vault`
+   2. To test jwt auto auth from app pod, uncomment `Create role for JWT auth for app pod`
+   3. `./jwt_auth.sh`
+6. Enable Vault Agent Injector (requires jwt_auth.sh to test JWT auth method auto-auth) 
    1. `./vai.sh`
       1. Check that secret exist in app pod
          1. `kubectl exec -ti -n vault web-app-<pod> -- cat /vault/secrets/password.txt`

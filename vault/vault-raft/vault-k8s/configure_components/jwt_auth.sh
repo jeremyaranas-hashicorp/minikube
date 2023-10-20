@@ -35,7 +35,7 @@ kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/role/test-role \
    policies="test-policy" \
    ttl="1h"
 
-# # Create role for JWT auth for Vault pod
+# # Create role to test JWT auth login from Vault pod using auto-auth
 # kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/role/test-role \
 #    role_type="jwt" \
 #    bound_audiences="https://kubernetes.default.svc.cluster.local" \
