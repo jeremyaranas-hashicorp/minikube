@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  labels:
+    app: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     app: demo
+  template:
+    metadata:
+      labels: 
+        app: demo
+    spec:
+      containers:
+        - name: app
+          image: curlimages/curl 
+          command: [ "sleep", "600" ]
+          volumeMounts:
+            - name: 'vault-db-creds'
+              mountPath: '/mnt/secrets-store'
+              readOnly: true
+      volumes:
+        - name: vault-db-creds
+          csi:
+            driver: 'secrets-store.csi.k8s.io'
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: 'vault-db-creds'
+      serviceAccountName: test-sa

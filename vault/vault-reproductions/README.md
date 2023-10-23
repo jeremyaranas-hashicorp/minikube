@@ -61,7 +61,7 @@ Options:
 
 # TO:DO
 
-Create if statement to check if VSO namespace exist
-Create if statement to check if VSO Helm chart is already installed 
-Create if statement to check if CSI Helm chart is already installed
-Move `vault auth enable kubernetes` outside of configure_k8s_auth function and create if statement to check if k8s auth is already enabled
+* Create if statement to check if VSO namespace exist
+* Create if statement to check if VSO Helm chart is already installed 
+* Create if statement to check if CSI Helm chart is already installed
+* Move `vault auth enable kubernetes` outside of configure_k8s_auth function and create if statement to check if k8s auth is already enabled
