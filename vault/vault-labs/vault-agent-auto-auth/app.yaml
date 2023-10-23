@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: vault
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      annotations:
+       vault.hashicorp.com/agent-inject: 'true'
+       vault.hashicorp.com/role: 'test-role'
+       vault.hashicorp.com/agent-inject-secret-password.txt: 'test/secret'
+       vault.hashicorp.com/auth-path: auth/jwt
+       vault.hashicorp.com/auth-type: jwt
+      #  vault.hashicorp.com/auth-config-path: /var/run/secrets/kubernetes.io/serviceaccount/token
+      #  vault.hashicorp.com/auth-config-remove_jwt_after_reading: 'false'
+      labels:
+        app: nginx
+    spec:
+      serviceAccountName: test-sa
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
