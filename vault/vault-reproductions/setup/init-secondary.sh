@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source ./common.sh
+source ../main/common.sh
 
 if [ -n "$VAULT_LICENSE" ]; 
     then echo "VAULT_LICENSE environment variable is set" 

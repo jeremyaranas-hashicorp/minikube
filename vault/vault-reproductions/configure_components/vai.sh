@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source ./common.sh
+source ../main/common.sh
 
 login_to_vault
 configure_secrets_engine
@@ -9,5 +9,5 @@ set_vault_policy
 configure_k8s_auth_role
 
 # Deploy application pod
-kubectl apply --filename app.yaml
+kubectl apply --filename ../manifests/app.yaml
 

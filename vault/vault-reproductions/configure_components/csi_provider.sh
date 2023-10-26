@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source ./common.sh
+source ../main/common.sh
 login_to_vault
 configure_secrets_engine
 configure_k8s_auth
@@ -13,7 +13,7 @@ helm install -n vault csi secrets-store-csi-driver/secrets-store-csi-driver \
     --set syncSecret.enabled=true
 
 # Create the SecretProviderClass
-kubectl apply --filename test-secretproviderclass.yaml
+kubectl apply --filename ../manifests/test-secretproviderclass.yaml
 
 # Create application pod
-kubectl apply --filename app-pod.yaml
+kubectl apply --filename ../manifests/app-pod.yaml
