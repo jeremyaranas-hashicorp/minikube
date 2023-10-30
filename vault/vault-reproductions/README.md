@@ -1,11 +1,17 @@
 This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
 
-Sources:
+# Prerequisites
 
-* https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/standalone-tls
-* https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-minikube-tls#create-the-certificate
+* `jq`
+* `kubectl`
+* `minikube`
+* `VAULT_LICENSE` env variable (add to bashrc or zshrc)
+* `kubectl` shortcut (optional)
+  * Add to bashrc or zshrc
+    * `alias k=kubectl`
+    * `complete -o default -F __start_kubectl k`
 
-Instructions: 
+# Instructions
 
 1. Start Minikube
    1. `minikube start`
@@ -18,7 +24,7 @@ Instructions:
    1. `cd` to **setup** directory
    2. `./init-secondary.sh`
 
-Options:
+# Options
 
 `cd` to **configure_components** directory
 
@@ -59,7 +65,13 @@ Options:
    2. `./enable_tls.sh`
    3. Unseal each pod once pods start
 
-# TO:DO
+
+# Sources
+
+* https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/standalone-tls
+* https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-minikube-tls#create-the-certificate
+
+# TO-DO
 
 * Create if statement to check if VSO namespace exist
 * Create if statement to check if VSO Helm chart is already installed 

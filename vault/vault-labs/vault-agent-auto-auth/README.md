@@ -1,5 +1,16 @@
 This is a lab on setting up Vault Agent auto-auth using the JWT auth method.
 
+# Prerequisites
+
+* `jq`
+* `kubectl`
+* `minikube`
+* `VAULT_LICENSE` env variable (add to bashrc or zshrc)
+* `kubectl` shortcut (optional)
+  * Add to bashrc or zshrc
+    * `alias k=kubectl`
+    * `complete -o default -F __start_kubectl k`
+
 # Set up lab
 
 1. Start minikube cluster
@@ -10,7 +21,7 @@ minikube start -p auto-auth-lab-cluster
 ```
 ./init-primary.sh
 ```
-1. Install prerequisites
+3. Install prerequisites
 ```
 ./prereqs.sh
 ```
