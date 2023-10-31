@@ -63,8 +63,8 @@ configure_k8s_auth_role () {
     else 
         echo "INFO: Configuring k8s auth method role"
         kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/role/test-role \
-        bound_service_account_names="vault,test-sa,default" \
-        bound_service_account_namespaces="vault,vso" \
+        bound_service_account_names="vault,test-sa,default,postgres-sa" \
+        bound_service_account_namespaces="vault,vso,default" \
         policies=test-policy \
         ttl=24h
     fi

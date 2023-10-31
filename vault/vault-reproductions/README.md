@@ -60,6 +60,8 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
       3. Check that auto_auth was configured in app pod for jwt auth (requires updating app.yaml annotations for jwt auth auto-auth)
          1. `kubectl exec -ti -n vault web-app-<pod> -c vault-agent -- sh`
          2. `cat /home/vault/config.json`
+      4. Check that secret exist in postgres pod (requires k8s_auth.sh and postgresql.sh to be run first)
+         1. `kubectl exec -ti postgres-<1234> -- cat /vault/secrets/password.txt`
 7. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine
    1. `./postgresql.sh`
    2. Get IP of PostgreSQL pod
@@ -82,7 +84,7 @@ vault write database/config/postgresql \
     username="root" \
     password="rootpassword"
 ```
-         5. Write database role
+         1. Write database role
 ```
 vault write database/roles/my-role \
     db_name="postgresql" \
@@ -108,3 +110,5 @@ vault write database/roles/my-role \
 * Create if statement to check if VSO Helm chart is already installed 
 * Create if statement to check if CSI Helm chart is already installed
 * Move `vault auth enable kubernetes` outside of configure_k8s_auth function and create if statement to check if k8s auth is already enabled
+* Remove nginx Vault Agent and use PostgreSQL for Vault Agent
+* Configure Vault Agent and PostgreSQL database credentials to see how renewal works

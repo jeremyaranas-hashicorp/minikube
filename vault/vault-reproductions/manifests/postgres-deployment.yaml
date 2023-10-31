@@ -9,9 +9,14 @@ spec:
       app: postgres
   template:
     metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'test-role'
+        vault.hashicorp.com/agent-inject-secret-password.txt: 'test/secret'
       labels:
         app: postgres
     spec:
+      serviceAccountName: postgres-sa
       containers:
         - name: postgres
           image: postgres:10.1 
