@@ -14,7 +14,7 @@ helm install vault-secrets-operator hashicorp/vault-secrets-operator --version 0
 kubectl create ns vso
 
 # Set up k8s auth method for the secret
-kubectl apply -f ../manifests/vault-auth-static.yaml
+kubectl apply -f ../manifests/vso-app-vault-auth.yaml
 
 # Create the secret 
-kubectl apply -f ../manifests/static-secret.yaml
+kubectl apply -f ../manifests/test-vault-static-secret.yaml

@@ -171,7 +171,7 @@ create_service_account_test-sa () {
         echo "INFO: test-sa service account already exist" 
     else 
         echo "INFO: Creating service account test-sa" 
-        kubectl apply -f ../manifests/service_account.yaml
+        kubectl apply -f ../manifests/test-sa-service_account.yaml
     fi
 }
 
@@ -182,7 +182,7 @@ create_k8s_secret () {
         echo "INFO: k8s secret already exist" 
     else 
         echo "INFO: Creating k8s secret"
-        kubectl apply -f ../manifests/secret.yaml 
+        kubectl apply -f ../manifests/test-sa-secret.yaml 
     fi
 }
 
