@@ -2,8 +2,8 @@
 
 source ../main/common.sh
 
-create_service_account
-create_secret
+create_service_account_test-sa
+create_k8s_secret
 
 kubectl get clusterrolebindings.rbac.authorization.k8s.io | grep -q token-review-clusterrolebindings
 if [ $? -eq 0 ] 

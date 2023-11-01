@@ -16,7 +16,7 @@ spec:
       labels:
         app: postgres
     spec:
-      serviceAccountName: postgres-sa
+      serviceAccountName: postgres-service-account
       containers:
         - name: postgres
           image: postgres:10.1 
