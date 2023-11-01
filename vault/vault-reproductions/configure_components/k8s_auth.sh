@@ -51,7 +51,7 @@ source ../main/common.sh
 set_vault_policy
 
 # Configure secrets engine
-configure_secrets_engine
+configure_test_secrets_engine
 
 # Associate the role to the service account and the policy
 configure_k8s_auth_role

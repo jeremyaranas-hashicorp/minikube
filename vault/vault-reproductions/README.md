@@ -69,17 +69,16 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
    1. `./postgresql-app-pod.sh`
    2. Get IP of PostgreSQL pod
       1. `kubectl get pod postgres-<1234> -o custom-columns=NAME:metadata.name,IP:status.podIP`
-      2. Login to Vault
-         1. `source ../main/common.sh`
-         2. `login_to_vault`
-      3. Exec into vault-0 pod
+      2. Exec into vault-0 pod
          1. `kubectl exec --stdin=true --tty=true -n vault vault-0 -- /bin/sh`
          2. Set IP address of PostgreSQL pod
             1. `export PG_IP=<ip_addr>:5432`
          3. Enable database secrets engine
             1. `vault secrets enable database`
-         4. Write database config
+         4. Write database config and role
+   
 ```
+# Config
 vault write database/config/postgresql \
     plugin_name=postgresql-database-plugin \
     allowed_roles="*" \
@@ -87,8 +86,9 @@ vault write database/config/postgresql \
     username="root" \
     password="rootpassword"
 ```
-         5. Write database role
+
 ```
+# Role
 vault write database/roles/my-role \
     db_name="postgresql" \
     creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; \
@@ -96,11 +96,11 @@ vault write database/roles/my-role \
     default_ttl="1m" \
     max_ttl="5m"
 ```
-1. Enable TLS
+
+8. Enable TLS
    1. `cd` to **tls** directory
    2. `./enable_tls.sh`
    3. Unseal each pod once pods start
-
 
 # Sources
 

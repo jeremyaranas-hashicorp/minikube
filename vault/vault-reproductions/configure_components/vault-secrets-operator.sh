@@ -3,7 +3,7 @@
 source ../main/common.sh
 
 configure_k8s_auth
-configure_secrets_engine
+configure_test_secrets_engine
 set_vault_policy
 configure_k8s_auth_role
 

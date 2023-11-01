@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-enable_pr () {
+enable_performance_replication () {
     login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault read sys/replication/status -format=json | jq .data.performance.mode | grep -q primary
     if [ $? -eq 0 ] 
     then 
-        echo "INFO: PR is already configured" 
+        echo "INFO: Performance replication is already configured" 
     else 
-        echo "INFO: Enabling PR" 
+        echo "INFO: Enabling performance replication" 
         kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/performance/primary/enable
         kubectl exec -ti -n vault vault-0 -- vault write sys/replication/performance/primary/secondary-token id="secondary" -format=json  | jq -r .wrap_info.token > sat.txt
         login_to_vault_secondary
@@ -17,14 +17,14 @@ enable_pr () {
     fi
 }
 
-configure_secrets_engine () {
+configure_test_secrets_engine () {
     login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault secrets list | grep -q test
     if [ $? -eq 0 ] 
     then 
-        echo "INFO: Secrets engine test is already configured" 
+        echo "INFO: test secrets engine is already configured" 
     else 
-        echo 'INFO: Setting up kv secrets engine test'
+        echo 'INFO: Setting up test secrets engine'
         kubectl exec -ti vault-0 -n vault -- vault secrets enable -path=test kv-v2
         kubectl exec -ti vault-0 -n vault -- vault kv put test/secret username="static-username" password="static-password"
     fi
