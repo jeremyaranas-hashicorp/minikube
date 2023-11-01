@@ -38,9 +38,9 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
       2. Test login using local JWT from Vault pod
          1. `VAULT_POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$VAULT_POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
-      3. Test login using local JWT from app pod (requires ./postgresql-app-pod.sh)
+      3. Test login using local JWT from app pod (requires ./postgresql-app-pod.sh) (TO-DO)
          1. `APP_POD_LOCAL_JWT=$(kubectl exec -ti postgres-<pod> -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
-         2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
+         2. `kubectl exec -ti postgres-<pod> -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
 3. Enable Vault Secrets Operator
    1. `./vault-secrets-operator.sh`
       1. Retrieve k8s secret
