@@ -31,7 +31,7 @@ kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/role/test-role \
    role_type="jwt" \
    bound_audiences="https://kubernetes.default.svc.cluster.local" \
    user_claim="sub" \
-   bound_subject="system:serviceaccount:vault:postgres-service-account" \
+   bound_subject="system:serviceaccount:default:postgres-service-account" \
    policies="test-policy" \
    ttl="1h"
 
