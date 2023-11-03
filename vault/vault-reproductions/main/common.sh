@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-enable_pr () {
+enable_performance_replication () {
     login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault read sys/replication/status -format=json | jq .data.performance.mode | grep -q primary
     if [ $? -eq 0 ] 
     then 
-        echo "INFO: PR is already configured" 
+        echo "INFO: Performance replication is already configured" 
     else 
-        echo "INFO: Enabling PR" 
+        echo "INFO: Enabling performance replication" 
         kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/performance/primary/enable
         kubectl exec -ti -n vault vault-0 -- vault write sys/replication/performance/primary/secondary-token id="secondary" -format=json  | jq -r .wrap_info.token > sat.txt
         login_to_vault_secondary
@@ -17,14 +17,14 @@ enable_pr () {
     fi
 }
 
-configure_secrets_engine () {
+configure_test_secrets_engine () {
     login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault secrets list | grep -q test
     if [ $? -eq 0 ] 
     then 
-        echo "INFO: Secrets engine test is already configured" 
+        echo "INFO: test secrets engine is already configured" 
     else 
-        echo 'INFO: Setting up kv secrets engine test'
+        echo 'INFO: Setting up test secrets engine'
         kubectl exec -ti vault-0 -n vault -- vault secrets enable -path=test kv-v2
         kubectl exec -ti vault-0 -n vault -- vault kv put test/secret username="static-username" password="static-password"
     fi
@@ -63,8 +63,8 @@ configure_k8s_auth_role () {
     else 
         echo "INFO: Configuring k8s auth method role"
         kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/role/test-role \
-        bound_service_account_names="vault,test-sa,default" \
-        bound_service_account_namespaces="vault,vso" \
+        bound_service_account_names="vault,test-sa,default,postgres-service-account" \
+        bound_service_account_namespaces="vault,vso,default" \
         policies=test-policy \
         ttl=24h
     fi
@@ -164,24 +164,46 @@ unseal_vault_secondary () {
     sleep 5
 }
 
-create_service_account () {
+create_service_account_test-sa () {
     kubectl get sa -n vault | grep -q test-sa
     if [ $? -eq 0 ] 
     then 
         echo "INFO: test-sa service account already exist" 
     else 
         echo "INFO: Creating service account test-sa" 
-        kubectl apply -f ../manifests/service_account.yaml
+        kubectl apply -f ../manifests/test-sa-service_account.yaml
     fi
 }
 
-create_secret () {
+create_k8s_secret () {
     kubectl get secret -n vault | grep -q test-sa
     if [ $? -eq 0 ] 
     then 
-        echo "INFO: test-sa secret already exist" 
+        echo "INFO: k8s secret already exist" 
     else 
-        echo "INFO: Creating secret test-sa"
-        kubectl apply -f ../manifests/secret.yaml 
+        echo "INFO: Creating k8s secret"
+        kubectl apply -f ../manifests/test-sa-secret.yaml 
+    fi
+}
+
+create_postgres-service-account () {
+    kubectl get sa | grep -q postgres-service-account
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: postgres-service-account service account already exist" 
+    else 
+        echo "INFO: Creating service account postgres-service-account" 
+        kubectl create sa postgres-service-account
+    fi
+}
+
+create_postgres-token-review-clusterrolebindings () {
+    kubectl get clusterrolebindings | grep -q postgres-token-review-clusterrolebindings
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: postgres-token-review-clusterrolebindings already exists" 
+    else 
+        echo "INFO: Creating postgres-token-review-clusterrolebindings"
+        kubectl apply -f ../manifests/postgres-token-review-clusterrolebindings.yaml 
     fi
 }

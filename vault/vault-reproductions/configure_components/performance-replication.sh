@@ -2,4 +2,4 @@
 
 source ../main/common.sh
 
-enable_pr
+enable_performance_replication

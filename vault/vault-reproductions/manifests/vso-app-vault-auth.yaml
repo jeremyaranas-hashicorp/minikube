@@ -1,7 +1,7 @@
 apiVersion: secrets.hashicorp.com/v1beta1
 kind: VaultAuth
 metadata:
-  name: app-vault-auth
+  name: vso-app-vault-auth
   namespace: default
 spec:
   method: kubernetes

@@ -3,7 +3,7 @@
 source ../main/common.sh
 
 configure_k8s_auth
-configure_secrets_engine
+configure_test_secrets_engine
 set_vault_policy
 configure_k8s_auth_role
 
@@ -14,7 +14,7 @@ helm install vault-secrets-operator hashicorp/vault-secrets-operator --version 0
 kubectl create ns vso
 
 # Set up k8s auth method for the secret
-kubectl apply -f ../manifests/vault-auth-static.yaml
+kubectl apply -f ../manifests/vso-app-vault-auth.yaml
 
 # Create the secret 
-kubectl apply -f ../manifests/static-secret.yaml
+kubectl apply -f ../manifests/test-vault-static-secret.yaml
