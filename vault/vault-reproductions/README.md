@@ -56,10 +56,10 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
    1. `./vault-agent.sh`
       1. Check that secret exists in postgres app pod (requires ./k8s_auth.sh and ./postgresql-app-pod.sh) 
          1. `kubectl exec -ti postgres-<pod> -- cat /vault/secrets/password.txt`
-      2. Check that auto_auth was configured in app pod for k8s auth (requires updating postgres-deployment.yaml annotations for k8s auth auto-auth, ./k8s_auth.sh, and ./postgresql-app-pod.sh) 
+      2. Check that auto_auth was configured in app pod for k8s auth (requires updating postgres.yaml annotations for k8s auth auto-auth, ./k8s_auth.sh, and ./postgresql-app-pod.sh) 
          1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
          2. `cat /home/vault/config.json`
-      3. Check that auto_auth was configured in app pod for jwt auth. Uncomment `Create role for JWT auth for app pod` in jwt_auth.sh and update postgres-deployment.yaml annotations for jwt auth auto-auth. Run ./k8s_auth.sh, ./postgresql-app-pod.sh, and ./jwt_auth.sh) 
+      3. Check that auto_auth was configured in app pod for jwt auth. Uncomment `Create role for JWT auth for app pod` in jwt_auth.sh and update postgres.yaml annotations for jwt auth auto-auth. Run ./k8s_auth.sh, ./postgresql-app-pod.sh, and ./jwt_auth.sh) 
          1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
          2. `cat /home/vault/config.json`
 7. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine
@@ -94,7 +94,7 @@ vault write database/roles/my-role \
     max_ttl="5m"
 ```
 
-8. Enable TLS
+1. Enable TLS 
    1. `cd` to **tls** directory
    2. `./enable_tls.sh`
    3. Unseal each pod once pods start
