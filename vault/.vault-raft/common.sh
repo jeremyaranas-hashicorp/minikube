@@ -66,6 +66,9 @@ set_vault_policy () {
         path "test/data/secret" {
         capabilities = ["read"]
         }
+        path "test/data/database/config" {
+        capabilities = ["read"]
+}
 EOF
 }
 
