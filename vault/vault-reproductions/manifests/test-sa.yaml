@@ -6,3 +6,9 @@ metadata:
   annotations:  
     kubernetes.io/service-account.name: test-sa  
 type: kubernetes.io/service-account-token  
+---
+apiVersion: v1
+kind: ServiceAccount  
+metadata:  
+  name: test-sa  
+  namespace: vault

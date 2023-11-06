@@ -171,7 +171,7 @@ create_service_account_test-sa () {
         echo "INFO: test-sa service account already exist" 
     else 
         echo "INFO: Creating service account test-sa" 
-        kubectl apply -f ../manifests/test-sa-service_account.yaml
+        kubectl apply -f ../manifests/test-sa.yaml
     fi
 }
 
@@ -182,7 +182,7 @@ create_k8s_secret () {
         echo "INFO: k8s secret already exist" 
     else 
         echo "INFO: Creating k8s secret"
-        kubectl apply -f ../manifests/test-sa-secret.yaml 
+        kubectl apply -f ../manifests/test-sa.yaml 
     fi
 }
 
@@ -197,13 +197,3 @@ create_postgres-service-account () {
     fi
 }
 
-create_postgres-token-review-clusterrolebindings () {
-    kubectl get clusterrolebindings | grep -q postgres-token-review-clusterrolebindings
-    if [ $? -eq 0 ] 
-    then 
-        echo "INFO: postgres-token-review-clusterrolebindings already exists" 
-    else 
-        echo "INFO: Creating postgres-token-review-clusterrolebindings"
-        kubectl apply -f ../manifests/postgres-token-review-clusterrolebindings.yaml 
-    fi
-}
