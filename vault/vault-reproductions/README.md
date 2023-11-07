@@ -23,6 +23,9 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
 3. Initialize secondary cluster (optional)
    1. `cd` to **setup** directory
    2. `./init-secondary.sh`
+4. Deploy an application pod for testing
+   1. `cd` to **setup** directory
+   2. `./application_pod.sh`
 
 # Options
 
@@ -30,9 +33,7 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
 
 1. Enable Performance Replication (requires ./init-secondary.sh)
    1. `./performance-replication.sh`
-2. Deploy application pod
-   1. `./application_pod.sh`
-3. Enable Kubernetes Authentication Method
+2. Enable Kubernetes Authentication Method
    1. `./k8s_auth.sh`
       1. Test login using long-lived token from service account
          1. `SA_JWT=$(kubectl get secret test-sa -n vault -o go-template='{{ .data.token }}' | base64 --decode)`   
@@ -40,18 +41,18 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
       2. Test login using local JWT from Vault pod
          1. `VAULT_POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$VAULT_POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
-4. Enable Vault Secrets Operator
+3. Enable Vault Secrets Operator
    1. `./vault-secrets-operator.sh`
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
-5. Enable CSI Provider
+4. Enable CSI Provider
    1. `./csi_provider.sh`
       1. Check that secret exist in app pod 
          1. `kubectl exec -n vault nginx -- cat /mnt/secrets-store/test-object`
-6. Enable JWT auth method 
+5. Enable JWT auth method 
    1. To test jwt login from Vault pod, uncomment `Create role to test JWT auth login from Vault pod using auto-auth` and `Login using JWT auth from Vault` in jwt_auth.sh
    2. `./jwt_auth.sh`
-7. Enable Vault Agent Injector 
+6. Enable Vault Agent Injector 
    1. Requires ./k8s_auth.sh and ./postgresql-app-pod.sh
    2. `./vault-agent.sh`
       1. Check that secret exists in postgres app pod (requires ./k8s_auth.sh and ./postgresql-app-pod.sh) 
@@ -62,7 +63,7 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
       3. Check that auto_auth was configured in app pod for jwt auth. Uncomment `Create role for JWT auth for app pod` in jwt_auth.sh and update postgres.yaml annotations for jwt auth auto-auth. Run ./k8s_auth.sh, ./postgresql-app-pod.sh, and ./jwt_auth.sh 
          1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
          2. `cat /home/vault/config.json`
-8. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine
+7. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine
    1. `./postgresql-app-pod.sh`
    2. Get IP of PostgreSQL pod
       1. `kubectl get pod postgres-<pod> -o custom-columns=NAME:metadata.name,IP:status.podIP`
