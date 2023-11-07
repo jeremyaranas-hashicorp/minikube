@@ -23,7 +23,8 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
 3. Initialize secondary cluster (optional)
    1. `cd` to **setup** directory
    2. `./init-secondary.sh`
-4. Deploy an application pod for testing
+
+4. Deploy an application pod for testing (optional)
    1. `cd` to **setup** directory
    2. `./application_pod.sh`
 
@@ -31,8 +32,9 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
 
 `cd` to **configure_components** directory
 
-1. Enable Performance Replication (requires ./init-secondary.sh)
-   1. `./performance-replication.sh`
+1. Enable Performance Replication 
+   1. Requires secondary cluster 
+   2. `./performance-replication.sh`
 2. Enable Kubernetes Authentication Method
    1. `./k8s_auth.sh`
       1. Test login using long-lived token from service account
