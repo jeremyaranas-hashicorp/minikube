@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+./k8s_auth.sh
+
 source ../main/common.sh
 login_to_vault
 configure_test_secrets_engine
@@ -16,4 +18,4 @@ helm install -n vault csi secrets-store-csi-driver/secrets-store-csi-driver \
 kubectl apply --filename ../manifests/test-secretproviderclass.yaml
 
 # Create application pod
-kubectl apply --filename ../manifests/nginx.yaml
+kubectl apply --filename ../manifests/alpine.yaml

@@ -1,15 +1,16 @@
 kind: Pod
 apiVersion: v1
 metadata:
-  name: nginx
+  name: alpine
   namespace: vault
 spec:
   serviceAccountName: test-sa
   containers:
-  - name: nginx
-    image: nginx:1.14.2    
-    ports:
-    - containerPort: 80
+  - name: alpine
+    image: alpine
+    command:
+      - sleep
+      - "3600"
     volumeMounts:
     - name: secrets-store-inline
       mountPath: "/mnt/secrets-store"

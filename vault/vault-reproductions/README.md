@@ -48,7 +48,7 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
 4. Enable CSI Provider
    1. `./csi_provider.sh`
       1. Check that secret exist in app pod 
-         1. `kubectl exec -n vault nginx -- cat /mnt/secrets-store/test-object`
+         1. `kubectl exec -n vault alpine -- cat /mnt/secrets-store/test-object`
 5. Enable JWT auth method 
    1. To test jwt login from Vault pod, uncomment `Create role to test JWT auth login from Vault pod using auto-auth` and `Login using JWT auth from Vault` in jwt_auth.sh
    2. `./jwt_auth.sh`
