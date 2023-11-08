@@ -45,19 +45,25 @@ The following options will configure different components, for example, Vault Ag
       2. Test login using local JWT from Vault pod
          1. `VAULT_POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$VAULT_POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
-3. Enable Vault Secrets Operator
+3. Deploy app pod for k8s auth
+   1. `./k8s_auth-app-pod.sh`
+      1. Export app pod local JWT
+         1. `APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
+      2. Authenticate from app pod to Vault
+         1. `kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-active.vault.svc.cluster.local:8200/v1/auth/kubernetes/login`
+4. Enable Vault Secrets Operator
    1. `./vault-secrets-operator.sh`
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
-4. Enable CSI Provider
+5. Enable CSI Provider
    1. `./csi_provider.sh`
       1. Check that secret exist in app pod 
          1. `kubectl exec -n vault alpine -- cat /mnt/secrets-store/test-object`
-5. Enable JWT auth method 
+6. Enable JWT auth method 
    1. `./jwt_auth.sh`
       1. Test login using JWT auth method
          1. `kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/login role=test-role jwt=@/var/run/secrets/kubernetes.io/serviceaccount/token`
-6. Enable Vault Agent Injector 
+7. Enable Vault Agent Injector 
    1. `./vault-agent.sh`
       1. Check that secret exists in postgres app pod 
          1. `kubectl exec -ti postgres-<pod> -- cat /vault/secrets/password.txt`
@@ -66,7 +72,7 @@ The following options will configure different components, for example, Vault Ag
          2. Check that config.json is rendered
             1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
             2. `cat /home/vault/config.json`
-7. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine
+8. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine
    1. `./postgresql-app-pod.sh`
    2. Get IP of PostgreSQL pod
       1. `kubectl get pod postgres-<pod> -o custom-columns=NAME:metadata.name,IP:status.podIP`
