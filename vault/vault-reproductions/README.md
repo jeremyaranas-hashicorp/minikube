@@ -30,6 +30,8 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
 
 # Options
 
+The following options will configure different components, for example, Vault Agent Injector, Vault Secrets Operator, etc. The scripts can be run in any order.
+
 `cd` to **configure_components** directory
 
 1. Enable Performance Replication 
@@ -96,7 +98,7 @@ vault write database/roles/my-role \
     max_ttl="5m"
 ```
 
-1. Enable TLS 
+8. Enable TLS 
    1. `cd` to **tls** directory
    2. `./enable_tls.sh`
    3. Unseal each pod once pods start
