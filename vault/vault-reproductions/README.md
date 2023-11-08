@@ -52,19 +52,18 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
       1. Check that secret exist in app pod 
          1. `kubectl exec -n vault alpine -- cat /mnt/secrets-store/test-object`
 5. Enable JWT auth method 
-   1. To test jwt login from Vault pod, uncomment `Create role to test JWT auth login from Vault pod using auto-auth` and `Login using JWT auth from Vault` in jwt_auth.sh
-   2. `./jwt_auth.sh`
+   1. `./jwt_auth.sh`
+      1. Test login using JWT auth method
+         1. `kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/login role=test-role jwt=@/var/run/secrets/kubernetes.io/serviceaccount/token`
 6. Enable Vault Agent Injector 
-   1. Requires ./k8s_auth.sh and ./postgresql-app-pod.sh
-   2. `./vault-agent.sh`
-      1. Check that secret exists in postgres app pod (requires ./k8s_auth.sh and ./postgresql-app-pod.sh) 
+   1. `./vault-agent.sh`
+      1. Check that secret exists in postgres app pod 
          1. `kubectl exec -ti postgres-<pod> -- cat /vault/secrets/password.txt`
-      2. Check that auto_auth was configured in app pod for k8s auth (requires updating postgres.yaml annotations for k8s auth auto-auth, ./k8s_auth.sh, and ./postgresql-app-pod.sh) 
-         1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
-         2. `cat /home/vault/config.json`
-      3. Check that auto_auth was configured in app pod for jwt auth. Uncomment `Create role for JWT auth for app pod` in jwt_auth.sh and update postgres.yaml annotations for jwt auth auto-auth. Run ./k8s_auth.sh, ./postgresql-app-pod.sh, and ./jwt_auth.sh 
-         1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
-         2. `cat /home/vault/config.json`
+      2. Configure JWT auto-auth
+         1. `./vault-agent-jwt-auto-auth.sh` 
+         2. Check that config.json is rendered
+            1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
+            2. `cat /home/vault/config.json`
 7. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine
    1. `./postgresql-app-pod.sh`
    2. Get IP of PostgreSQL pod
@@ -109,9 +108,4 @@ vault write database/roles/my-role \
 
 # TO-DO
 
-* Create if statement to check if VSO namespace exist
-* Create if statement to check if VSO Helm chart is already installed 
-* Create if statement to check if CSI Helm chart is already installed
-* Move `vault auth enable kubernetes` outside of configure_k8s_auth function and create if statement to check if k8s auth is already enabled
-* Replace Vault Agent to use postgres pod instead of nginx pod
 * Configure Vault Agent and PostgreSQL database credentials to see how renewal works

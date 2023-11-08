@@ -13,6 +13,11 @@ spec:
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/role: 'test-role'
         vault.hashicorp.com/agent-inject-secret-password.txt: 'test/secret'
+        # Annotations for jwt auth method auto-auth (uncomment to set up k8s auth method auto-auth)
+        vault.hashicorp.com/auth-path: auth/jwt
+        vault.hashicorp.com/auth-type: jwt
+        vault.hashicorp.com/auth-config-path: /var/run/secrets/kubernetes.io/serviceaccount/token
+        vault.hashicorp.com/auth-config-remove_jwt_after_reading: 'false'
       labels:
         app: postgres
     spec:

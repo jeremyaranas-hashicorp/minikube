@@ -26,11 +26,11 @@ kubectl exec -n vault vault-0 -- vault write auth/jwt/config \
 # Find default audience
 kubectl create token default | cut -f2 -d. | base64 --decode
 
-# Create role to test JWT auth login from Vault pod using auto-auth
+# Create role for JWT auth for app pod
 kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/role/test-role \
    role_type="jwt" \
    bound_audiences="https://kubernetes.default.svc.cluster.local" \
    user_claim="sub" \
-   bound_subject="system:serviceaccount:vault:vault" \
+   bound_subject="system:serviceaccount:default:postgres-service-account" \
    policies="test-policy" \
    ttl="1h"
