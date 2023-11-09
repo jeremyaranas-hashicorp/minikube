@@ -64,7 +64,7 @@ EOF
 fi
 }
 
-enable_k8s_auth_role () {
+configure_k8s_auth_role () {
     login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault list auth/kubernetes/role | grep -q test-role
     if [ $? -eq 0 ] 

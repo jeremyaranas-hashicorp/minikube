@@ -53,6 +53,6 @@ set_vault_policy
 configure_test_secrets_engine
 
 # Associate the role to the service account and the policy
-enable_k8s_auth_role
+configure_k8s_auth_role
   
 # Reference https://support.hashicorp.com/hc/en-us/articles/4404389946387

@@ -56,7 +56,8 @@ The following options will configure different components, for example, Vault Ag
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
 5. Enable CSI Provider
-   1. `./csi_provider.sh`
+   1. alpine app pod will need to be deleted if created from step 3
+   2. `./csi_provider.sh`
       1. Check that secret exist in app pod 
          1. `kubectl exec -n vault alpine -- cat /mnt/secrets-store/test-object`
 6. Enable JWT auth method 
@@ -72,7 +73,7 @@ The following options will configure different components, for example, Vault Ag
          2. Check that config.json is rendered
             1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
             2. `cat /home/vault/config.json`
-8. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine
+8. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine 
    1. `./postgresql-app-pod.sh`
    2. Get IP of PostgreSQL pod
       1. `kubectl get pod postgres-<pod> -o custom-columns=NAME:metadata.name,IP:status.podIP`
@@ -104,10 +105,26 @@ vault write database/roles/my-role \
     max_ttl="5m"
 ```
 
-8. Enable TLS 
+8. Enable TLS
    1. `cd` to **tls** directory
    2. `./enable_tls.sh`
-   3. Unseal each pod once pods start
+   3. Unseal each pod on the primary 
+      1. `export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" ../setup/init.json)`
+      2. `kubectl exec -ti -n vault vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      3. `kubectl exec -ti -n vault vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      4. `kubectl exec -ti -n vault vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY`
+   4. Check that VAULT_ADDR is using https
+      1. `kubectl exec -ti -n vault vault-0 -- sh`
+         1. `echo $VAULT_ADDR`
+         2. `vault status`
+   5. Unseal each pod on the secondary 
+      1. `kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      2. `kubectl exec -ti -n vault-secondary vault-secondary-1 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      3. `kubectl exec -ti -n vault-secondary vault-secondary-2 -- vault operator unseal $VAULT_UNSEAL_KEY`
+   6. Check that VAULT_ADDR is using https
+      1. `kubectl exec -ti -n vault-secondary vault-secondary-0 -- sh`
+         1. `echo $VAULT_ADDR`
+         2. `vault status`
 
 # Sources
 

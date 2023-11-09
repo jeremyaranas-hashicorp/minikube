@@ -7,7 +7,7 @@ login_to_vault
 configure_test_secrets_engine
 enable_k8s_auth
 set_vault_policy
-enable_k8s_auth_role
+configure_k8s_auth_role
 
 # Install secrets store CSI driver
 helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
