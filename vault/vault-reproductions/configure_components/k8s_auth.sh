@@ -32,7 +32,7 @@ EOF
 fi
 
 source ../main/common.sh
-configure_k8s_auth
+enable_k8s_auth
 
 # Retrieve the k8s CA certificate
 KUBE_CA_CERT=$(kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 --decode)
@@ -40,8 +40,7 @@ KUBE_CA_CERT=$(kubectl config view --raw --minify --flatten -o jsonpath='{.clust
 # Retrieve the k8s host URL
 KUBE_HOST=$(kubectl exec -ti -n vault vault-0 -- env | grep KUBERNETES_SERVICE_HOST | cut -d "=" -f2)
 
-# Configure the k8s auth method to use the vault service account JWT, location of the k8s host and its certificate
-kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://10.96.0.1:443" kubernetes_ca_cert="$KUBE_CA_CERT" disable_local_ca_jwt="true"
+configure_k8s_auth
 
 # Read the k8s config
 kubectl exec -ti -n vault vault-0 -- vault read auth/kubernetes/config
@@ -54,6 +53,6 @@ set_vault_policy
 configure_test_secrets_engine
 
 # Associate the role to the service account and the policy
-configure_k8s_auth_role
+enable_k8s_auth_role
   
 # Reference https://support.hashicorp.com/hc/en-us/articles/4404389946387
