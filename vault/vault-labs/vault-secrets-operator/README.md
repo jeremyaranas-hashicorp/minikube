@@ -104,3 +104,4 @@ kubectl logs -n vault-secrets-operator-system vault-secrets-operator-controller-
 2. https://developer.hashicorp.com/vault/tutorials/kubernetes/vault-secrets-operator
 3. https://docs.google.com/presentation/d/1rre051TcABm4aMreYNbSURuheL-PFW0hHkHe5rlWiPg/edit#slide=id.g25b059dd4e8_0_0
 4. https://developer.hashicorp.com/vault/docs/platform/k8s/vso/sources/vault
+5. https://developer.hashicorp.com/vault/docs/platform/k8s/vso
