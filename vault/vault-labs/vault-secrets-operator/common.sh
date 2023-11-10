@@ -76,8 +76,3 @@ unseal_vault () {
     kubectl exec -n vault vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
     sleep 5
 }
-
-create_service_account () {   
-    echo 'INFO: Creating service account'  
-    kubectl apply -f vso-sa.yaml
-}
