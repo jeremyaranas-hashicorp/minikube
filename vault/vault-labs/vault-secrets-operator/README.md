@@ -85,7 +85,7 @@ kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --dec
 ```
 16.  Check logs of VSO controller to check secret sync status
 ```
-kubectl logs -n vault-secrets-operator-system vault-secrets-operator-controller-manager-<123> -f
+kubectl logs -n vault-secrets-operator-system vault-secrets-operator-controller-manager-<12345> -f
 ```
 ```
 2023-11-10T00:09:01Z	DEBUG	events	Secret synced	{"type": "Normal", "object": {"kind":"VaultStaticSecret","namespace":"vso","name":"vault-kv-app","uid":"873f578e-2299-44e9-a60b-4dce8302ad46","apiVersion":"secrets.hashicorp.com/v1beta1","resourceVersion":"774"}, "reason": "SecretSynced"}
@@ -96,7 +96,7 @@ kubectl exec -ti vault-0 -n vault -- vault kv put test/secret username="static-u
 ```
 18. Check logs of VSO controller to check secret sync status
 ```
-kubectl logs -n vault-secrets-operator-system vault-secrets-operator-controller-manager-<1234> -f
+kubectl logs -n vault-secrets-operator-system vault-secrets-operator-controller-manager-<12345> -f
 ```
 ```
 2023-11-10T18:19:03Z	DEBUG	events	Secret synced	{"type": "Normal", "object": {"kind":"VaultStaticSecret","namespace":"vso","name":"vault-kv-app","uid":"15da04fe-1217-401f-b60c-2fc7f4c8a3b6","apiVersion":"secrets.hashicorp.com/v1beta1","resourceVersion":"1664"}, "reason": "SecretRotated"}
