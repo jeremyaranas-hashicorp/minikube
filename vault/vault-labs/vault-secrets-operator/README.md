@@ -57,6 +57,10 @@ This is a lab on setting up Vault Secrets Operator (VSO).
 2023-11-10T00:09:01Z	DEBUG	events	Secret synced	{"type": "Normal", "object": {"kind":"VaultStaticSecret","namespace":"vso","name":"vault-kv-app","uid":"873f578e-2299-44e9-a60b-4dce8302ad46","apiVersion":"secrets.hashicorp.com/v1beta1","resourceVersion":"774"}, "reason": "SecretSynced"}
 ```
 
+# Cleanup
+
+1. `./cleanup.sh` will remove init.json and delete Minikube `vso` cluster 
+
 # References
 
 1. https://hashicorp.atlassian.net/wiki/spaces/VSE/pages/2691433293/VSO+on+Openshift
