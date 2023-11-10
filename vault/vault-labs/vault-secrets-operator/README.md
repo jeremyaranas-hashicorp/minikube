@@ -64,12 +64,10 @@ helm install vault-secrets-operator hashicorp/vault-secrets-operator --version 0
 ```
 kubectl logs -n vault-secrets-operator-system vault-secrets-operator-controller-manager-<123>
 ```
-
 ```
 2023-11-10T00:08:40Z	DEBUG	events	VaultConnection accepted	{"type": "Normal", "object": {"kind":"VaultConnection","namespace":"vault-secrets-operator-system","name":"default","uid":"c637c75a-f21a-40a8-aa4b-1da4fda5541d","apiVersion":"secrets.hashicorp.com/v1beta1","resourceVersion":"731"}, "reason": "Accepted"}
 ```
-
-12. Create a k8s namespace called vso  
+12. Create a k8s namespace called vso where the k8s secret will be stored 
 ```
 kubectl create ns vso
 ```
@@ -77,19 +75,18 @@ kubectl create ns vso
 ```
 kubectl apply -f vault-auth-static.yaml
 ```
-14. Deploy Vault static secret custom resource to create the secret secretkv in the vso namespace
+14. Deploy Vault static secret custom resource to create the k8s secret secretkv in the vso namespace
 ```
 kubectl apply -f static-secret.yaml
 ```
-15. Check that Vault secret from the kv store has been added as a Kubernetes secret 
+15.  Check that the Vault secret from the kv secrets engine has been added as a Kubernetes secret 
 ```
 kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
 ```
-16. Check logs of VSO controller to check secret sync status
+16.  Check logs of VSO controller to check secret sync status
 ```
 kubectl logs -n vault-secrets-operator-system vault-secrets-operator-controller-manager-<123> -f
 ```
-
 ```
 2023-11-10T00:09:01Z	DEBUG	events	Secret synced	{"type": "Normal", "object": {"kind":"VaultStaticSecret","namespace":"vso","name":"vault-kv-app","uid":"873f578e-2299-44e9-a60b-4dce8302ad46","apiVersion":"secrets.hashicorp.com/v1beta1","resourceVersion":"774"}, "reason": "SecretSynced"}
 ```
