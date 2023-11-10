@@ -61,3 +61,5 @@ This is a lab on setting up Vault Secrets Operator (VSO).
 
 1. https://hashicorp.atlassian.net/wiki/spaces/VSE/pages/2691433293/VSO+on+Openshift
 2. https://developer.hashicorp.com/vault/tutorials/kubernetes/vault-secrets-operator
+3. https://docs.google.com/presentation/d/1rre051TcABm4aMreYNbSURuheL-PFW0hHkHe5rlWiPg/edit#slide=id.g25b059dd4e8_0_0
+4. https://developer.hashicorp.com/vault/docs/platform/k8s/vso/sources/vault
