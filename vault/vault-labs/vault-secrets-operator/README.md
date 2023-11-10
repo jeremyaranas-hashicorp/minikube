@@ -62,7 +62,7 @@ helm install vault-secrets-operator hashicorp/vault-secrets-operator --version 0
 ```
 11. Check logs of VSO controller to confirm connection to Vault
 ```
-kubectl logs -n vault-secrets-operator-system vault-secrets-operator-controller-manager-<123>
+kubectl logs -n vault-secrets-operator-system vault-secrets-operator-controller-manager-<12345>
 ```
 ```
 2023-11-10T00:08:40Z	DEBUG	events	VaultConnection accepted	{"type": "Normal", "object": {"kind":"VaultConnection","namespace":"vault-secrets-operator-system","name":"default","uid":"c637c75a-f21a-40a8-aa4b-1da4fda5541d","apiVersion":"secrets.hashicorp.com/v1beta1","resourceVersion":"731"}, "reason": "Accepted"}
