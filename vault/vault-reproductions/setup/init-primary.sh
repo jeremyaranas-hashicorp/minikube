@@ -23,5 +23,6 @@ export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" init.json)
 kubectl exec -ti vault-1 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
 kubectl exec -ti vault-2 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
 
-
+# Set up audit logs
+../configure_components/audit_logs.sh
 
