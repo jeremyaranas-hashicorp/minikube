@@ -56,10 +56,9 @@ The following options will configure different components, for example, Vault Ag
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
 5. Enable CSI Provider
-   1. alpine app pod will need to be deleted if created from step 3
-   2. `./csi_provider.sh`
+   1. `./csi_provider.sh`
       1. Check that secret exist in app pod 
-         1. `kubectl exec -n vault alpine -- cat /mnt/secrets-store/test-object`
+         1. `kubectl exec -n vault csi-alpine -- cat /mnt/secrets-store/test-object`
 6. Enable JWT auth method 
    1. `./jwt_auth.sh`
       1. Test login using JWT auth method
