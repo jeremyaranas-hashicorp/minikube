@@ -37,7 +37,10 @@ The following options will configure different components, for example, Vault Ag
 1. Enable Performance Replication 
    1. Requires secondary cluster 
    2. `./performance-replication.sh`
-2. Enable Kubernetes Authentication Method
+2. Enable DR Replication 
+   1. Requires secondary cluster 
+   2. `./dr-replication.sh`
+3. Enable Kubernetes Authentication Method
    1. `./k8s_auth.sh`
       1. Test login using long-lived token from service account
          1. `SA_JWT=$(kubectl get secret test-sa -n vault -o go-template='{{ .data.token }}' | base64 --decode)`   
@@ -45,25 +48,25 @@ The following options will configure different components, for example, Vault Ag
       2. Test login using local JWT from Vault pod
          1. `VAULT_POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$VAULT_POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
-3. Deploy app pod for k8s auth
+4. Deploy app pod for k8s auth
    1. `./k8s_auth-app-pod.sh`
       1. Export app pod local JWT
          1. `APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
       2. Authenticate from app pod to Vault
          1. `kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-active.vault.svc.cluster.local:8200/v1/auth/kubernetes/login`
-4. Enable Vault Secrets Operator
+5. Enable Vault Secrets Operator
    1. `./vault-secrets-operator.sh`
       1. Retrieve k8s secret
          1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
-5. Enable CSI Provider
+6. Enable CSI Provider
    1. `./csi_provider.sh`
       1. Check that secret exist in app pod 
          1. `kubectl exec -n vault csi-alpine -- cat /mnt/secrets-store/test-object`
-6. Enable JWT auth method 
+7. Enable JWT auth method 
    1. `./jwt_auth.sh`
       1. Test login using JWT auth method
          1. `kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/login role=test-role jwt=@/var/run/secrets/kubernetes.io/serviceaccount/token`
-7. Enable Vault Agent Injector 
+8. Enable Vault Agent Injector 
    1. `./vault-agent.sh`
       1. Check that secret exists in postgres app pod 
          1. `kubectl exec -ti postgres-<pod> -- cat /vault/secrets/password.txt`
@@ -72,7 +75,7 @@ The following options will configure different components, for example, Vault Ag
          2. Check that config.json is rendered
             1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
             2. `cat /home/vault/config.json`
-8. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine 
+9. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine 
    1. `./postgresql-app-pod.sh`
    2. Get IP of PostgreSQL pod
       1. `kubectl get pod postgres-<pod> -o custom-columns=NAME:metadata.name,IP:status.podIP`
