@@ -24,5 +24,4 @@ kubectl exec -ti vault-1 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
 kubectl exec -ti vault-2 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
 
 # Set up audit logs
-../configure_components/audit_logs.sh
-
+enable_audit_device

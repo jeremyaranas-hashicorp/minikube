@@ -17,12 +17,26 @@ enable_performance_replication () {
     fi
 }
 
+enable_audit_device () {
+    login_to_vault
+    kubectl exec -ti -n vault vault-0 -- touch /vault/audit/audit.log
+    kubectl exec -ti -n vault vault-0 -- chown vault:vault /vault/audit/audit.log
+    kubectl exec -ti -n vault vault-0 -- vault audit enable file file_path=/vault/audit/audit.log
+}
+
+enable_audit_device_secondary () {
+    login_to_vault_secondary
+    kubectl exec -ti -n vault-secondary vault-secondary-0 -- mkdir -p /vault/audit
+    kubectl exec -ti -n vault-secondary vault-secondary-0 -- touch /vault/audit/audit.log
+    kubectl exec -ti -n vault-secondary vault-secondary-0 -- chown vault:vault /vault/audit/audit.log
+}
+
 enable_dr_replication () {
     login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault read sys/replication/status -format=json | jq .data.dr.mode | grep -q primary
     if [ $? -eq 0 ] 
     then 
-        echo "INFO: Performance DR is already configured" 
+        echo "INFO: DR replication is already configured" 
     else 
         echo "INFO: Enabling DR replication" 
         kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/dr/primary/enable
