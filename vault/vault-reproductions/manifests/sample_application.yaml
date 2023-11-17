@@ -32,7 +32,6 @@ spec:
       containers:
         - name: orgchart
           image: jweissig/app:0.0.1
-
 ---
 apiVersion: v1
 kind: ConfigMap

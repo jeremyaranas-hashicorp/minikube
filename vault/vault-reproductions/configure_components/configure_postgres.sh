@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
-kubectl apply -f ../manifests/sample-app.yaml 
+source ../main/common.sh
+
+kubectl exec -ti -n vault vault-0 -- vault secrets enable database 
+
+kubectl apply -f ../manifests/postgres-db.yaml
+
