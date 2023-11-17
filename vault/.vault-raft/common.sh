@@ -62,21 +62,24 @@ configure_k8s_auth () {
 
 set_vault_policy () {
     echo 'INFO: Writing Vault policy'
-    kubectl exec -ti vault-0 -- vault policy write test-policy - <<EOF
+    kubectl exec -ti -n vault vault-0 -- vault policy write test-policy - <<EOF
         path "test/data/secret" {
         capabilities = ["read"]
         }
         path "test/data/database/config" {
         capabilities = ["read"]
-}
+        }
+        path "database/creds/readonly" {
+        capabilities = ["read"]
+        }
 EOF
 }
 
 configure_k8s_auth_role () {
     echo "INFO: Configuring k8s auth method role"
     kubectl exec -ti vault-0 -- vault write auth/kubernetes/role/test-role \
-        bound_service_account_names=test-sa,vault \
-        bound_service_account_namespaces=default,test-namespace \
+        bound_service_account_names=test-sa,internal-app,vault \
+        bound_service_account_namespaces=default,test-namespace,vault \
         policies=test-policy \
         ttl=24h
     kubectl create sa test-sa
@@ -85,6 +88,11 @@ configure_k8s_auth_role () {
 deploy_app () {
     echo "INFO: Deploying application"
     kubectl apply --filename nginx-deployment.yaml
+}
+
+deploy_db_app () {
+    echo "INFO: Deploying application"
+    kubectl apply --filename sample-app-db-engine.yaml
 }
 
 install_vault_helm_namespace () {
