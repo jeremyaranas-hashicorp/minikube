@@ -86,6 +86,15 @@ The following options will configure different components, for example, Vault Ag
          3. Enable database secrets engine
             1. `vault secrets enable database`
          4. Write database config and role
+10. Configure Postgres with Application Pod
+    1. `./k8s_auth.sh`
+    2. `db-engine.sh`
+    3. `kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config \
+    kubernetes_host="https://10.96.0.1:443"`
+    4. `kubectl apply -f ../manifests/sample-app.yaml`
+    5. ssh to sample-app and `watch -n 1 cat /vault/secrets/database-creds.txt`
+    6. `kubectl exec -ti postgres -- sh`
+
    
 ```
 # Config

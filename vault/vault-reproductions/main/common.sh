@@ -91,6 +91,12 @@ set_vault_policy () {
             path "test/data/secret" {
             capabilities = ["read"]
             }
+            path "test/data/database/config" {
+            capabilities = ["read"]
+            }
+            path "database/creds/readonly" {
+            capabilities = ["read"]
+            }
 EOF
 fi
 }
@@ -104,7 +110,7 @@ configure_k8s_auth_role () {
     else 
         echo "INFO: Configuring k8s auth method role"
         kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/role/test-role \
-        bound_service_account_names="vault,test-sa,default,postgres-service-account" \
+        bound_service_account_names="vault,test-sa,default,internal-app,postgres-service-account,vault" \
         bound_service_account_namespaces="vault,vso,default" \
         policies=test-policy \
         ttl=24h
@@ -238,3 +244,7 @@ create_postgres-service-account () {
     fi
 }
 
+deploy_db_app () {
+    echo "INFO: Deploying application"
+    kubectl apply --filename ../manifests/sample-app.yaml
+}
