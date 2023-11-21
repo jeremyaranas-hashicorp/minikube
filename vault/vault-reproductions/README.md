@@ -72,40 +72,42 @@ The following options will configure different components, for example, Vault Ag
          1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
          2. `cat /home/vault/config.json`
    4. Configure Vault Agent with Dynamic Postgres Database Credentials
-      1. `./k8s_auth.sh`
+      1. `./vault-agent.sh`
       2. Deploy Postgres pod
          1. `./configure_postgres.sh`
       3. Configure Postgres database secrets engine
          1. Get IP of Postgres pod
-         2. `export PG_IP=$(kubectl get pod postgres --template '{{.status.podIP}}')`
-         3. Write database config
-         4. `kubectl exec -ti -n vault vault-0 -- vault write database/config/postgresql plugin_name=postgresql-database-plugin connection_url="postgresql://{{username}}:{{password}}@$PG_IP:5432/postgres?sslmode=disable" allowed_roles=readonly username="root"  password="rootpassword"`
-         5. Create a file for the Postgres creation statements in the Vault pod
-         6. Remote into Vault pod
-             1. `kubectl exec -ti -n vault vault-0 -- sh`
-             2. Create file
-                 1. `vi /tmp/readonly.sql` 
-                 2. Add the following content
-                     1. `CREATE ROLE "{{name}}" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}' INHERIT;`
-                     2. `GRANT ro TO "{{name}}";`
-                 3. Write role for database config
-                     1. `kubectl exec -ti -n vault vault-0 -- vault write database/roles/readonly db_name=postgresql creation_statements=@/tmp/readonly.sql default_ttl=1m max_ttl=1m`
-         7. Create roles in Postgres
+            1. `export PG_IP=$(kubectl get pod postgres --template '{{.status.podIP}}')`
+         2. Write database config
+            1. `kubectl exec -ti -n vault vault-0 -- vault write database/config/postgresql plugin_name=postgresql-database-plugin connection_url="postgresql://{{username}}:{{password}}@$PG_IP:5432/postgres?sslmode=disable" allowed_roles=readonly username="root"  password="rootpassword"`
+         3. Create a file for the Postgres creation statements in the Vault pod
+            1. Remote into Vault pod
+                1. `kubectl exec -ti -n vault vault-0 -- sh`
+                2. Create file
+                    1. `vi /tmp/readonly.sql` 
+                       1. Add the following content
+                           1. `CREATE ROLE "{{name}}" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}' INHERIT;`
+                           2. `GRANT ro TO "{{name}}";`
+            2. Exit pod
+              1. Write role for database config
+                 1. `kubectl exec -ti -n vault vault-0 -- vault write database/roles/readonly db_name=postgresql creation_statements=@/tmp/readonly.sql default_ttl=1m max_ttl=1m`
+         4. Create roles in Postgres
             1. Remote into Postgres pod
                1. `kubectl exec -ti postgres -- sh`
-               2. Run the following commands
-                  1. `psql -U root -c "CREATE ROLE \"ro\" NOINHERIT;"`
-                  2. `psql -U root -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"ro\";"`
-         8. Update Kubernetes auth method config to work with sample application pod
+                  1. Run the following commands
+                     1. `psql -U root -c "CREATE ROLE \"ro\" NOINHERIT;"`
+                     2. `psql -U root -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"ro\";"`
+            2. Exit pod
+         5. Update Kubernetes auth method config to work with sample application pod
             1. `kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://10.96.0.1:443"`
-         9. Deploy sample application
+         6. Deploy sample application
             1. `./configure_sample_app.sh`
-         10. Check that credentials are automatically updated in sample application pod
+         7.  Check that credentials are automatically updated in sample application pod
              1. Remote into orgchart pod
                 1. `kubectl exec -ti -n vault orgchart-<123> -- sh`
                    1. Check database-creds.txt to see credentials update
                       1. `watch -n 1 cat /vault/secrets/database-creds.txt`
-          11. Check that credentials are renewed in Postgres pod
+          8.  Check that credentials are renewed in Postgres pod
              1. Remote into Postgres pod
                 1. `kubectl exec -ti postgres -- sh`
                    1. Run while loop to see credentials update
