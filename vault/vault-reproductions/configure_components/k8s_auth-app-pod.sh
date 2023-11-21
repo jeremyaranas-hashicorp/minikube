@@ -8,14 +8,16 @@
 # Write config
 kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://10.96.0.1:443" disable_local_ca_jwt=false
 
-# Manual steps to configure k8s auth method with disable_local_ca_jwt set to true
+# With disable_local_ca_jwt=true
+
+# Manual steps 
+
 # Get CA cert from app pod
 # kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
 # Create file in Vault pod for ca.crt, copy ca.crt contents from app pod, paste ca.crt contents from app pod to Vault pod
 # kubectl exec -ti -n vault vault-0 -- sh
 # vi /tmp/ca.crt
-
 # Exit Vault pod
 
 # Get service account JWT

@@ -7,7 +7,7 @@
 # Login to Vault
 source ../main/common.sh
 login_to_vault
-create_service_account_test-sa
+create_test_sa_resources
 
 # Ensure OIDC discovery URLs 
 kubectl create clusterrolebinding oidc-reviewer  \
