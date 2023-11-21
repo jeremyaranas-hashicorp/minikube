@@ -2,8 +2,7 @@
 
 source ../main/common.sh
 
-create_service_account_test-sa
-create_k8s_secret
+create_test_sa_resources
 
 kubectl get clusterrolebindings.rbac.authorization.k8s.io | grep -q token-review-clusterrolebindings
 if [ $? -eq 0 ] 
@@ -31,7 +30,6 @@ subjects:
 EOF
 fi
 
-source ../main/common.sh
 enable_k8s_auth
 
 # Retrieve the k8s CA certificate
@@ -41,18 +39,8 @@ KUBE_CA_CERT=$(kubectl config view --raw --minify --flatten -o jsonpath='{.clust
 KUBE_HOST=$(kubectl exec -ti -n vault vault-0 -- env | grep KUBERNETES_SERVICE_HOST | cut -d "=" -f2)
 
 configure_k8s_auth
-
-# Read the k8s config
-kubectl exec -ti -n vault vault-0 -- vault read auth/kubernetes/config
-
-# Write a policy to associate with the role used for login by the service account
-source ../main/common.sh
 set_vault_policy
-
-# Configure secrets engine
 configure_test_secrets_engine
-
-# Associate the role to the service account and the policy
 configure_k8s_auth_role
   
 # Reference https://support.hashicorp.com/hc/en-us/articles/4404389946387

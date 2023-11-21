@@ -211,26 +211,8 @@ unseal_vault_secondary () {
     sleep 5
 }
 
-create_service_account_test-sa () {
-    kubectl get sa -n vault | grep -q test-sa
-    if [ $? -eq 0 ] 
-    then 
-        echo "INFO: test-sa service account already exist" 
-    else 
-        echo "INFO: Creating service account test-sa" 
-        kubectl apply -f ../manifests/test-sa.yaml
-    fi
-}
-
-create_k8s_secret () {
-    kubectl get secret -n vault | grep -q test-sa
-    if [ $? -eq 0 ] 
-    then 
-        echo "INFO: k8s secret already exist" 
-    else 
-        echo "INFO: Creating k8s secret"
-        kubectl apply -f ../manifests/test-sa.yaml 
-    fi
+create_test_sa_resources () {
+    kubectl apply -f ../manifests/test-sa.yaml
 }
 
 create_postgres-service-account () {

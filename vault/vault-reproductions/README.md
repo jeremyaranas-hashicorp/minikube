@@ -24,10 +24,6 @@ This repo spins up a Vault Raft cluster in k8s using the Vault Helm chart.
    1. `cd` to **setup** directory
    2. `./init-secondary.sh`
 
-4. Deploy an application pod for testing (optional)
-   1. `cd` to **setup** directory
-   2. `./application_pod.sh`
-
 # Options
 
 The following options will configure different components, for example, Vault Agent Injector, Vault Secrets Operator, etc. The scripts can be run in any order.
@@ -39,7 +35,7 @@ The following options will configure different components, for example, Vault Ag
    2. `./performance-replication.sh`
 2. Enable DR Replication 
    1. Requires secondary cluster 
-   2. `./dr-replication.sh`
+   2. `./dr-replication.sh` 
 3. Enable Kubernetes Authentication Method
    1. `./k8s_auth.sh`
       1. Test login using long-lived token from service account
@@ -48,128 +44,95 @@ The following options will configure different components, for example, Vault Ag
       2. Test login using local JWT from Vault pod
          1. `VAULT_POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$VAULT_POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
-4. Deploy app pod for k8s auth
-   1. `./k8s_auth-app-pod.sh`
-      1. Export app pod local JWT
-         1. `APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
-      2. Authenticate from app pod to Vault
-         1. `kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-active.vault.svc.cluster.local:8200/v1/auth/kubernetes/login`
-5. Enable Vault Secrets Operator
+      3. Deploy app pod to test k8s auth [LEFT OFF HERE]
+         1. `./k8s_auth-app-pod.sh`
+            1. Export app pod local JWT
+               1. `APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
+            2. Authenticate from app pod to Vault using local JWT
+               1. `kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-active.vault.svc.cluster.local:8200/v1/auth/kubernetes/login`
+4. Enable Vault Secrets Operator
    1. `./vault-secrets-operator.sh`
-      1. Retrieve k8s secret
-         1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
-6. Enable CSI Provider
+   2. Retrieve k8s secret
+      1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
+5. Enable CSI Provider
    1. `./csi_provider.sh`
-      1. Check that secret exist in app pod 
-         1. `kubectl exec -n vault csi-alpine -- cat /mnt/secrets-store/test-object`
-7. Enable JWT auth method 
+   2. Check that secret exist in app pod 
+      1. `kubectl exec -n vault csi-alpine -- cat /mnt/secrets-store/test-object`
+6. Enable JWT auth method 
    1. `./jwt_auth.sh`
-      1. Test login using JWT auth method
-         1. `kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/login role=test-role jwt=@/var/run/secrets/kubernetes.io/serviceaccount/token`
-8. Enable Vault Agent Injector 
+   2. Test login using JWT auth method
+      1. `kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/login role=test-role jwt=@/var/run/secrets/kubernetes.io/serviceaccount/token`
+7. Enable Vault Agent Injector 
    1. `./vault-agent.sh`
-      1. Check that secret exists in postgres app pod 
-         1. `kubectl exec -ti postgres-<pod> -- cat /vault/secrets/password.txt`
-      2. Configure JWT auto-auth
-         1. `./vault-agent-jwt-auto-auth.sh` 
-         2. Check that config.json is rendered
-            1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
-            2. `cat /home/vault/config.json`
-9. Configure [PostgreSQL](https://www.containiq.com/post/deploy-postgres-on-kubernetes) pod and database secrets engine 
-   1. `./postgresql-app-pod.sh`
-   2. Get IP of PostgreSQL pod
-      1. `kubectl get pod postgres-<pod> -o custom-columns=NAME:metadata.name,IP:status.podIP`
-      2. Exec into vault-0 pod
-         1. `kubectl exec --stdin=true --tty=true -n vault vault-0 -- /bin/sh`
-         2. Set IP address of PostgreSQL pod
-            1. `export PG_IP=<ip_addr>:5432`
-         3. Enable database secrets engine
-            1. `vault secrets enable database`
-         4. Write database config and role
-```
-# Config
-vault write database/config/postgresql \
-    plugin_name=postgresql-database-plugin \
-    allowed_roles="*" \
-    connection_url="postgresql://{{username}}:{{password}}@$PG_IP/postgres?sslmode=disable" \
-    username="root" \
-    password="rootpassword"
-```
-```
-# Role
-vault write database/roles/my-role \
-    db_name="postgresql" \
-    creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; \
-        GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{{name}}\";" \
-    default_ttl="1m" \
-    max_ttl="5m"
-```
-10. Configure Sample Application Pod to Get Postgres Database Credentials
-    1.  Enable Kubernetes auth, create service accounts
-        1. `./k8s_auth.sh`
-     2. Deploy Postgres pod
-        1. `./configure_postgres.sh`
-     3. Configure Postgres database secrets engine
-        1. Get IP of Postgres pod
-           1. `export PG_IP=$(kubectl get pod postgres --template '{{.status.podIP}}')`
-        2. Write database config
-           1. `kubectl exec -ti -n vault vault-0 -- vault write database/config/postgresql plugin_name=postgresql-database-plugin connection_url="postgresql://{{username}}:{{password}}@$PG_IP:5432/postgres?sslmode=disable" allowed_roles=readonly username="root"  password="rootpassword"`
-        3. Create a file for the Postgres creation statements in the Vault pod
-           1. Remote into Vault pod
-              1. `kubectl exec -ti -n vault vault-0 -- sh`
-           2. Create file
-              1. `vi /tmp/readonly.sql` 
-           3. Add the following content
-              1. `CREATE ROLE "{{name}}" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}' INHERIT;`
-              2. `GRANT ro TO "{{name}}";`
-        4. Write role for database config
-           1. `kubectl exec -ti -n vault vault-0 -- vault write database/roles/readonly db_name=postgresql creation_statements=@/tmp/readonly.sql default_ttl=1m max_ttl=1m`
-        5. Create roles in Postgres
-           1. Remote into Postgres pod
-              1. `kubectl exec -ti postgres -- sh`
-           2. Run the following commands
-              1. `psql -U root -c "CREATE ROLE \"ro\" NOINHERIT;"`
-              2. `psql -U root -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"ro\";"`
-        6. Update Kubernetes auth method config to work with sample application pod
-           1. `kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://10.96.0.1:443"`
-        7. Deploy sample application
-           1. `./configure_sample_app.sh`
-        8. Check that credentials are automatically updated in sample application pod
-           1. Remote into orgchart pod
-              1. `kubectl exec -ti -n vault orgchart-<123> -- sh`
-           2. Check database-creds.txt to see credentials update
-              1. `watch -n 1 cat /vault/secrets/database-creds.txt`
-        9. Check that credentials are renewed in Postgres pod
-           1.  Remote into Postgres pod
-               1.  `kubectl exec -ti postgres -- sh`
-           2.  Run while loop to see credentials update
-               1.  `while :; do psql -U root -c "SELECT usename, valuntil FROM pg_user;"; sleep 1; done`
- 11. Enable TLS
-     1. `cd` to **tls** directory
-     2. `./enable_tls.sh`
-     3. Unseal each pod on the primary 
-        1. `export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" ../setup/init.json)`
-        2. `kubectl exec -ti -n vault vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY`
-        3. `kubectl exec -ti -n vault vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY`
-        4. `kubectl exec -ti -n vault vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY`
-     4. Check that VAULT_ADDR is using https
-        1. `kubectl exec -ti -n vault vault-0 -- sh`
-        2. `echo $VAULT_ADDR`
-        3. `vault status`
-     5. Unseal each pod on the secondary 
-        1. `kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault operator unseal $VAULT_UNSEAL_KEY`
-        2. `kubectl exec -ti -n vault-secondary vault-secondary-1 -- vault operator unseal $VAULT_UNSEAL_KEY`
-        3. `kubectl exec -ti -n vault-secondary vault-secondary-2 -- vault operator unseal $VAULT_UNSEAL_KEY`
-     6. Check that VAULT_ADDR is using https
-        1. `kubectl exec -ti -n vault-secondary vault-secondary-0 -- sh`
-        2. `echo $VAULT_ADDR`
-        3. `vault status`
+   2. Check that secret exists in postgres app pod 
+      1. `kubectl exec -ti postgres-<pod> -- cat /vault/secrets/password.txt`
+   3. Configure Vault Agent with JWT auto-auth
+      1. `./vault-agent-jwt-auto-auth.sh` 
+      2. Check that config.json is rendered
+         1. `kubectl exec -ti postgres-<pod> -c vault-agent -- sh`
+         2. `cat /home/vault/config.json`
+   4. Configure Vault Agent with Dynamic Postgres Database Credentials
+      1. `./k8s_auth.sh`
+      2. Deploy Postgres pod
+         1. `./configure_postgres.sh`
+      3. Configure Postgres database secrets engine
+         1. Get IP of Postgres pod
+         2. `export PG_IP=$(kubectl get pod postgres --template '{{.status.podIP}}')`
+         3. Write database config
+         4. `kubectl exec -ti -n vault vault-0 -- vault write database/config/postgresql plugin_name=postgresql-database-plugin connection_url="postgresql://{{username}}:{{password}}@$PG_IP:5432/postgres?sslmode=disable" allowed_roles=readonly username="root"  password="rootpassword"`
+         5. Create a file for the Postgres creation statements in the Vault pod
+         6. Remote into Vault pod
+             1. `kubectl exec -ti -n vault vault-0 -- sh`
+             2. Create file
+                 1. `vi /tmp/readonly.sql` 
+                 2. Add the following content
+                     1. `CREATE ROLE "{{name}}" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}' INHERIT;`
+                     2. `GRANT ro TO "{{name}}";`
+                 3. Write role for database config
+                     1. `kubectl exec -ti -n vault vault-0 -- vault write database/roles/readonly db_name=postgresql creation_statements=@/tmp/readonly.sql default_ttl=1m max_ttl=1m`
+         7. Create roles in Postgres
+            1. Remote into Postgres pod
+               1. `kubectl exec -ti postgres -- sh`
+               2. Run the following commands
+                  1. `psql -U root -c "CREATE ROLE \"ro\" NOINHERIT;"`
+                  2. `psql -U root -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"ro\";"`
+         8. Update Kubernetes auth method config to work with sample application pod
+            1. `kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://10.96.0.1:443"`
+         9. Deploy sample application
+            1. `./configure_sample_app.sh`
+         10. Check that credentials are automatically updated in sample application pod
+             1. Remote into orgchart pod
+                1. `kubectl exec -ti -n vault orgchart-<123> -- sh`
+                   1. Check database-creds.txt to see credentials update
+                      1. `watch -n 1 cat /vault/secrets/database-creds.txt`
+          11. Check that credentials are renewed in Postgres pod
+             1. Remote into Postgres pod
+                1. `kubectl exec -ti postgres -- sh`
+                   1. Run while loop to see credentials update
+                      1. `while :; do psql -U root -c "SELECT usename, valuntil FROM pg_user;"; sleep 1; done`
+8. Enable TLS
+   1. `cd` to **tls** directory
+      1. `./enable_tls.sh`
+   2. Unseal each pod on the primary 
+      1. `export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" ../setup/init.json)`
+      2. `kubectl exec -ti -n vault vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      3. `kubectl exec -ti -n vault vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      4. `kubectl exec -ti -n vault vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      5. Check that VAULT_ADDR is using https
+         1. `kubectl exec -ti -n vault vault-0 -- sh`
+            1. `echo $VAULT_ADDR`
+            2. `vault status`
+   3. Unseal each pod on the secondary 
+      1. `kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      2. `kubectl exec -ti -n vault-secondary vault-secondary-1 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      3. `kubectl exec -ti -n vault-secondary vault-secondary-2 -- vault operator unseal $VAULT_UNSEAL_KEY`
+      4. Check that VAULT_ADDR is using https
+         1. `kubectl exec -ti -n vault-secondary vault-secondary-0 -- sh`
+            1. `echo $VAULT_ADDR`
+            2. `vault status`
 
 # Sources
 
 * https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/standalone-tls
 * https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-minikube-tls#create-the-certificate
 
-# TO-DO
-
-* Configure Vault Agent and PostgreSQL database credentials to see how renewal works
