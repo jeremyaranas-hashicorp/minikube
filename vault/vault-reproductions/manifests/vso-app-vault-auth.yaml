@@ -1,11 +1,17 @@
 apiVersion: secrets.hashicorp.com/v1beta1
 kind: VaultAuth
 metadata:
-  name: vso-app-vault-auth
-  namespace: default
+  name: static-auth
+  namespace: vso
 spec:
+  # Auth method to use when authenticating to Vault
   method: kubernetes
+  # Auth method mount 
   mount: kubernetes
   kubernetes:
+    # Vault role to use when authenticating to Vault
     role: test-role
+    # ServiceAccount to use when authenticating to Vault
     serviceAccount: default
+    audiences:
+      - vault

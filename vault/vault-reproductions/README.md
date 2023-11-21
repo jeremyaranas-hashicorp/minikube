@@ -50,10 +50,10 @@ The following options will configure different components, for example, Vault Ag
                1. `APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
             2. Authenticate from app pod to Vault using local JWT
                1. `kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-active.vault.svc.cluster.local:8200/v1/auth/kubernetes/login`
-4. Enable Vault Secrets Operator [NEED TO FIX]
+4. Enable Vault Secrets Operator 
    1. `./vault-secrets-operator.sh`
    2. Retrieve k8s secret
-      1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
+      1. `kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode`
 5. Enable CSI Provider
    1. `./csi_provider.sh`
    2. Check that secret exist in app pod 
@@ -112,7 +112,7 @@ The following options will configure different components, for example, Vault Ag
                 1. `kubectl exec -ti postgres -- sh`
                    1. Run while loop to see credentials update
                       1. `while :; do psql -U root -c "SELECT usename, valuntil FROM pg_user;"; sleep 1; done`
-8. Enable TLS
+8. Enable TLS [NEED TO TEST]
    1. `cd` to **tls** directory
       1. `./enable_tls.sh`
    2. Unseal each pod on the primary 
