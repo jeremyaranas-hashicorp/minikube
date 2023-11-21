@@ -44,20 +44,20 @@ The following options will configure different components, for example, Vault Ag
       2. Test login using local JWT from Vault pod
          1. `VAULT_POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$VAULT_POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
-      3. Deploy app pod to test k8s auth [LEFT OFF HERE]
+      3. Deploy app pod to test k8s auth 
          1. `./k8s_auth-app-pod.sh`
             1. Export app pod local JWT
                1. `APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
             2. Authenticate from app pod to Vault using local JWT
                1. `kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-active.vault.svc.cluster.local:8200/v1/auth/kubernetes/login`
-4. Enable Vault Secrets Operator
+4. Enable Vault Secrets Operator [NEED TO FIX]
    1. `./vault-secrets-operator.sh`
    2. Retrieve k8s secret
       1. `kubectl get secret -n vso test-k8s-secret -o jsonpath="{.data.password}" | base64 --decode`
 5. Enable CSI Provider
    1. `./csi_provider.sh`
    2. Check that secret exist in app pod 
-      1. `kubectl exec -n vault csi-alpine -- cat /mnt/secrets-store/test-object`
+      1. `kubectl exec -n vault alpine-app -- cat /mnt/secrets-store/test-object`
 6. Enable JWT auth method 
    1. `./jwt_auth.sh`
    2. Test login using JWT auth method
