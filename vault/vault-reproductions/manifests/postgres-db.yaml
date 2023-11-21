@@ -1,0 +1,13 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: postgres
+spec:
+  containers:
+  - image: postgres
+    name: postgres
+    env:
+    - name: POSTGRES_USER
+      value: root
+    - name: POSTGRES_PASSWORD
+      value: rootpassword
