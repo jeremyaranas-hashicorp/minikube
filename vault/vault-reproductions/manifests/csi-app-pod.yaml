@@ -1,7 +1,7 @@
 kind: Pod
 apiVersion: v1
 metadata:
-  name: alpine-app
+  name: csi-app-pod
   namespace: vault
 spec:
   serviceAccountName: test-sa

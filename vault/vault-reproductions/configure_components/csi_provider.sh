@@ -18,4 +18,4 @@ helm install -n vault csi secrets-store-csi-driver/secrets-store-csi-driver \
 kubectl apply --filename ../manifests/csi-secret-provider-class.yaml
 
 # Create application pod
-kubectl apply --filename ../manifests/alpine.yaml
+kubectl apply --filename ../manifests/csi-app-pod.yaml

@@ -33,13 +33,13 @@ The following options will configure different components, for example, Vault Ag
 1. Enable Performance Replication 
    1. Requires secondary cluster 
    2. `./performance-replication.sh`
-2. Enable DR Replication 
+2. Enable DR Replication [NEED TO TEST]
    1. Requires secondary cluster 
    2. `./dr-replication.sh` 
 3. Enable Kubernetes Authentication Method
    1. `./k8s_auth.sh`
       1. Test login using long-lived token from service account
-         1. `SA_JWT=$(kubectl get secret test-secret-n vault -o go-template='{{ .data.token }}' | base64 --decode)`   
+         1. `SA_JWT=$(kubectl get secret test-secret -n vault -o go-template='{{ .data.token }}' | base64 --decode)`   
          2. `kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$SA_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login`
       2. Test login using local JWT from Vault pod
          1. `VAULT_POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)`
@@ -57,7 +57,7 @@ The following options will configure different components, for example, Vault Ag
 5. Enable CSI Provider
    1. `./csi_provider.sh`
    2. Check that secret exist in app pod 
-      1. `kubectl exec -n vault alpine-app -- cat /mnt/secrets-store/test-object`
+      1. `kubectl exec -n vault csi-app-pod -- cat /mnt/secrets-store/test-object`
 6. Enable JWT auth method 
    1. `./jwt_auth.sh`
    2. Test login using JWT auth method
@@ -74,7 +74,7 @@ The following options will configure different components, for example, Vault Ag
    4. Configure Vault Agent with Dynamic Postgres Database Credentials
       1. `./vault-agent.sh`
       2. Deploy Postgres pod
-         1. `./configure_postgres.sh`
+         1. `./postgresql-app-pod-01.sh`
       3. Configure Postgres database secrets engine
          1. Get IP of Postgres pod
             1. `export PG_IP=$(kubectl get pod postgres --template '{{.status.podIP}}')`
@@ -101,7 +101,7 @@ The following options will configure different components, for example, Vault Ag
          5. Update Kubernetes auth method config to work with sample application pod
             1. `kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://10.96.0.1:443"`
          6. Deploy sample application
-            1. `./configure_sample_app.sh`
+            1. `./sample_app.sh`
          7.  Check that credentials are automatically updated in sample application pod
              1. Remote into orgchart pod
                 1. `kubectl exec -ti -n vault orgchart-<123> -- sh`

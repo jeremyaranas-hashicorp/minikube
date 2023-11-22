@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-kubectl apply -f ../manifests/postgres.yaml 
+kubectl apply -f ../manifests/postgres-app-pod-03.yaml 
 
 # Create service account and clusterrolebindings for postgres pod
 source ../main/common.sh
