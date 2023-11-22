@@ -42,7 +42,7 @@ server:
         }
   image:
     repository: hashicorp/vault-enterprise
-    tag: 1.14.0-ent
+    tag: 1.15.0-ent
   enterpriseLicense:
     secretName: vault-ent-license
   extraEnvironmentVars:

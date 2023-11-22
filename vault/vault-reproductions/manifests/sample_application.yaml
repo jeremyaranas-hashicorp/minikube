@@ -56,7 +56,7 @@ data:
         "type" = "file"
       }
     }
-
+    
     "exit_after_auth" = false
     "pid_file" = "/home/vault/.pid"
     "log_level" = "trace"
