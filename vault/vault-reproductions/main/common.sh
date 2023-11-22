@@ -212,7 +212,7 @@ unseal_vault_secondary () {
 }
 
 create_test_sa_resources () {
-    kubectl apply -f ../manifests/test-sa.yaml
+    kubectl apply -f ../manifests/test-resources.yaml
 }
 
 create_postgres-service-account () {
