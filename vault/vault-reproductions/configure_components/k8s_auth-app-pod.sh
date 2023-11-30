@@ -21,7 +21,7 @@ kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernet
 # Exit Vault pod
 
 # Get service account JWT
-# SA_JWT=$(kubectl get secret -n vault test-sa -o go-template='{{ .data.token }}' | base64 --decode)
+# SA_JWT=$(kubectl get secret -n vault test-secret -o go-template='{{ .data.token }}' | base64 --decode)
 
 # Write k8s auth method config
 # kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://10.96.0.1:443" disable_local_ca_jwt=true kubernetes_ca_cert=@/tmp/ca.crt token_reviewer_jwt=$SA_JWT
