@@ -11,6 +11,14 @@ This repo spins up a Vault Raft cluster in Kubernetes using the Vault Helm chart
     * `alias k=kubectl`
     * `complete -o default -F __start_kubectl k`
 
+HashiCorp Helm repo
+```
+helm repo add hashicorp https://helm.releases.hashicorp.com
+```
+```
+helm repo update
+```
+
 # Deploy Vault cluster in Kubernetes
 
 Start Minikube cluster
@@ -333,20 +341,10 @@ kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --dec
 
 ### Consul Backend
 
-```
-helm repo add hashicorp https://helm.releases.hashicorp.com
-```
-```
-helm repo update
-```
-
-Deploy Consul Helm chart 
-```
-helm install consul hashicorp/consul --values helm_chart_value_files/consul-values.yaml
-```
 Deploy Vault Helm chart
+`cd` to **setup** directory
 ```
-helm install vault hashicorp/vault --values helm_chart_value_files/vault-consul-values.yaml
+./init-primary_consul.sh
 ```
 Init and unseal Vault
 ```

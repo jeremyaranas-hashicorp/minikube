@@ -162,6 +162,17 @@ install_vault_helm () {
     fi
 }
 
+install_vault_with_consul_helm () {
+    helm ls -n vault | grep -q consul
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: Vault Helm chart already deployed" 
+    else 
+        echo "INFO: Installing Vault Helm chart"
+        helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_value_files/vault-consul-values.yaml
+    fi
+}
+
 init_vault () {
     echo 'INFO: Waiting for container to start'
     while [[ $(kubectl get pods -n vault -l app.kubernetes.io/name=vault -o jsonpath='{.items[*].status.containerStatuses[0].started}') != true* ]]; 
