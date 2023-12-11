@@ -346,17 +346,6 @@ Deploy Vault Helm chart
 ```
 ./init-primary_consul.sh
 ```
-Init and unseal Vault
-```
-kubectl exec vault-0 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > cluster-keys.json
-```
-```
-VAULT_UNSEAL_KEY=$(cat cluster-keys.json | jq -r ".unseal_keys_b64[]")
-```
-```
-kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
-```
-
 
 # Sources
 
