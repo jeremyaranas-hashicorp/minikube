@@ -331,6 +331,35 @@ Retrieve k8s secret
 kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
 ```
 
+### Consul Backend
+
+```
+helm repo add hashicorp https://helm.releases.hashicorp.com
+```
+```
+helm repo update
+```
+
+Deploy Consul Helm chart 
+```
+helm install consul hashicorp/consul --values helm_chart_value_files/consul-values.yaml
+```
+Deploy Vault Helm chart
+```
+helm install vault hashicorp/vault --values helm_chart_value_files/vault-consul-values.yaml
+```
+Init and unseal Vault
+```
+kubectl exec vault-0 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > cluster-keys.json
+```
+```
+VAULT_UNSEAL_KEY=$(cat cluster-keys.json | jq -r ".unseal_keys_b64[]")
+```
+```
+kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
+```
+
+
 # Sources
 
 * https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/standalone-tls
