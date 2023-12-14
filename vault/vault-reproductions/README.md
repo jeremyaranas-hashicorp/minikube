@@ -212,76 +212,7 @@ Spin up TLS cluster
 ### Vault Agent with Dynamic Postgres Credentials
 
 ```
-./vault-agent.sh
-```
-
-Deploy Postgres pod
-```
-./postgresql-app-pod-01.sh
-```
-
-Get IP of Postgres pod
-```
-export PG_IP=$(kubectl get pod postgres --template '{{.status.podIP}}')
-```
-
-Write database config
-```
-kubectl exec -ti -n vault vault-0 -- vault write database/config/postgresql plugin_name=postgresql-database-plugin connection_url="postgresql://{{username}}:{{password}}@$PG_IP:5432/postgres?sslmode=disable" allowed_roles=readonly username="root"  password="rootpassword"
-```
-
-Create a file for the Postgres creation statements in the Vault pod
-```
-kubectl exec -ti -n vault vault-0 -- sh
-```
-
-Create file
-```
-vi /tmp/readonly.sql
-``` 
-
-Add the following content
-```
-CREATE ROLE "{{name}}" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}' INHERIT;
-GRANT ro TO "{{name}}";
-```
-
-Exit pod
-```
-exit
-```
-
-Write role for database config
-```
-kubectl exec -ti -n vault vault-0 -- vault write database/roles/readonly db_name=postgresql creation_statements=@/tmp/readonly.sql default_ttl=1m max_ttl=1m
-```
-
-Create roles in Postgres
-```
-kubectl exec -ti postgres -- sh
-```
-
-Run the following commands
-```
-psql -U root -c "CREATE ROLE \"ro\" NOINHERIT;"
-```
-```
-psql -U root -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"ro\";"
-```
-
-Exit pod
-```
-exit
-```
-
-Update Kubernetes auth method config to work with sample application pod
-```
-kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://10.96.0.1:443"
-```
-
-Deploy sample application
-```
-./sample_app.sh
+./vault-agent-injector-dynamic-postgres-creds.sh
 ```
 
 Check that credentials are automatically updated in sample application pod
