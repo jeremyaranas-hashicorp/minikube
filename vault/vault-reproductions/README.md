@@ -270,6 +270,20 @@ Retrieve k8s secret
 kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
 ```
 
+### Vault Transit Auto-unseal
+
+`cd` to **setup** directory
+```
+./transit-init.sh
+```
+```
+cat token.json
+```
+Copy token and update token in seal config in helm_chart_value_files/vault-values-transit.yaml with token
+```
+./vault-init.sh
+```
+
 ### Consul Backend
 
 Deploy Vault Helm chart
