@@ -38,11 +38,7 @@ ui:
   serviceNodePort: null
   externalPort: 8200
   targetPort: 8200
-  
 
-  
-
-  
   
 
 

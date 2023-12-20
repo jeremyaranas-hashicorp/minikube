@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 source ../main/common.sh
-
+login_to_vault
 create_test_sa_resources
 
 kubectl get clusterrolebindings.rbac.authorization.k8s.io | grep -q token-review-clusterrolebindings

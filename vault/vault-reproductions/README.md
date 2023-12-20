@@ -40,7 +40,7 @@ Initialize secondary cluster (optional, only needed for replication)\
 
 # Reproduction Scenarios
 
-`cd` to **configure_components** directory
+`cd` to **scripts** directory
 
 ### CSI Provider
 
@@ -76,14 +76,6 @@ SA_JWT=$(kubectl get secret test-secret -n vault -o go-template='{{ .data.token 
 ```
 ```
 kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$SA_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login
-```
-
-Test login using local JWT from Vault pod
-```
-VAULT_POD_LOCAL_JWT=$(kubectl exec -ti -n vault vault-0 -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-```      
-```
-kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$VAULT_POD_LOCAL_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login
 ```
 
 Deploy app pod to test k8s auth 
@@ -201,48 +193,6 @@ Enable DR replication
 ./dr-replication.sh
 ``` 
 
-### TLS
-
-Spin up TLS cluster
-`cd` to **setup** directory
-```
-./init_cluster_tls.sh
-```
-
-### Vault Agent Injector with TLS
-Spin up TLS cluster
-`cd` to **setup** directory
-```
-./init_cluster_tls.sh
-```
-`cd` to **configure_components** directory
-```
-./vault-agent-tls.sh
-```
-```
-./postgresql-app-pod-02-tls.sh
-```
-Confirm that cluster is using TLS by entering shell session in pod
-```
-kubectl exec -ti -n vault vault-0 -- sh
-```
-Check $VAULT_ADDR to confirm schema is using https
-```
-echo $VAULT_ADDR
-```
-Run `vault status`
-```
-vault status
-```
-Exit pod
-```
-exit
-```
-Check that secret was rendered to application pod
-```
-kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
-```
-
 ### Vault Agent with Dynamic Postgres Credentials
 
 ```
@@ -324,12 +274,59 @@ kubectl exec -ti vault-1 -- vault status
 kubectl exec -ti vault-2 -- vault status
 ```
 
+### TLS
+
+Spin up TLS cluster
+`cd` to **setup** directory
+```
+./init_cluster_tls.sh
+```
+
+### Vault Agent Injector with TLS
+Spin up TLS cluster
+`cd` to **setup** directory
+```
+./init_cluster_tls.sh
+```
+`cd` to **scripts** directory
+```
+./vault-agent-tls.sh
+```
+```
+./postgresql-app-pod-02-tls.sh
+```
+Confirm that cluster is using TLS by entering shell session in pod
+```
+kubectl exec -ti -n vault vault-0 -- sh
+```
+Check $VAULT_ADDR to confirm schema is using https
+```
+echo $VAULT_ADDR
+```
+Run `vault status`
+```
+vault status
+```
+Exit pod
+```
+exit
+```
+Check that secret was rendered to application pod
+```
+kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
+```
+
 ### Consul Backend
 
 Deploy Vault Helm chart
 `cd` to **setup** directory
 ```
 ./init-primary_consul.sh
+```
+
+Check that Vault is using Consul 
+```
+kubectl exec -ti -n vault vault-0 -- vault status
 ```
 
 # Sources

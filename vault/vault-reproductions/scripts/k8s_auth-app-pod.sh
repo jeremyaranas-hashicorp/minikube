@@ -2,6 +2,7 @@
 
 # With disable_local_ca_jwt=false
 
+source ../main/common.sh
 ./k8s_auth.sh
 ../setup/application_pod.sh
 

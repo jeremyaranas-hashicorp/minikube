@@ -13,6 +13,3 @@ spec:
       - "3600"
     imagePullPolicy: IfNotPresent
     name: alpine
-
-
-

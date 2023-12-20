@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-export SERVICE=vault-tls
-export NAMESPACE=vault
-export SECRET_NAME=vault-tls
-export TMPDIR=/tmp/vault
-export CSR_NAME=vault-csr
-export HELMNAME=vault
+export SERVICE=vault-tls-secondary
+export NAMESPACE=vault-secondary
+export SECRET_NAME=vault-tls-secondary
+export TMPDIR=/tmp/vault-secondary
+export CSR_NAME=vault-csr-secondary
+export HELMNAME=vault-secondary
 
-mkdir -p /tmp/vault
+mkdir -p /tmp/vault-secondary
 
 # Create a key for Kubernetes to sign
 openssl genrsa -out ${TMPDIR}/vault.key 2048
@@ -57,18 +57,23 @@ EOF
 
 # Send the CSR to Kubernetes
 kubectl create -f ${TMPDIR}/csr.yaml
+sleep 5
 
 # Approve the CSR in Kubernetes
 kubectl certificate approve ${CSR_NAME}
+sleep 5
 
 # Retrieve the certificate
 serverCert=$(kubectl get csr ${CSR_NAME} -o jsonpath='{.status.certificate}')
+sleep 5
 
 # Write the certificate to a file
 echo "${serverCert}" | openssl base64 -d -A -out ${TMPDIR}/vault.crt
+sleep 5
 
 # Retrieve Kubernetes CA 
 kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 -d > ${TMPDIR}/vault.ca
+sleep 5
 
 # Create namespace
 kubectl create namespace ${NAMESPACE}
@@ -79,6 +84,3 @@ kubectl create secret generic ${SECRET_NAME} \
     --from-file=vault.key=${TMPDIR}/vault.key \
     --from-file=vault.crt=${TMPDIR}/vault.crt \
     --from-file=vault.ca=${TMPDIR}/vault.ca
-
-# Kubernetes secret for Vault Agent Injector TLS 
-kubectl create secret generic ${SECRET_NAME} --from-file=vault.key=${TMPDIR}/vault.key --from-file=vault.crt=${TMPDIR}/vault.crt --from-file=vault.ca=${TMPDIR}/vault.ca

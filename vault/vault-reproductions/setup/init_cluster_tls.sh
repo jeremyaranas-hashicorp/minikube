@@ -10,9 +10,10 @@ if [ -n "$VAULT_LICENSE" ];
 fi
 
 rm -fr /tmp/vault
-../tls/certs.sh
+sleep 5
+../scripts/certs.sh
 set_ent_license
-helm install vault hashicorp/vault -f ../helm_chart_value_files/vault-values-tls.yaml -n vault
+helm install vault hashicorp/vault -f ../helm_chart_values_files/vault-values-tls.yaml -n vault
 init_vault
 unseal_vault
 
@@ -26,9 +27,10 @@ kubectl exec -ti vault-1 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
 kubectl exec -ti vault-2 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
 
 rm -fr /tmp/vault-secondary
-../tls/certs-secondary.sh
+sleep 5
+../scripts/certs-secondary.sh
 set_ent_license_secondary
-helm install vault-secondary hashicorp/vault -f ../helm_chart_value_files/vault-values-secondary-tls.yaml -n vault-secondary
+helm install vault-secondary hashicorp/vault -f ../helm_chart_values_files/vault-values-secondary-tls.yaml -n vault-secondary
 init_vault_secondary
 unseal_vault_secondary
 
@@ -40,4 +42,3 @@ sleep 10
 
 kubectl exec -ti vault-secondary-1 -n vault-secondary -- vault operator unseal $VAULT_UNSEAL_KEY_SECONDARY
 kubectl exec -ti vault-secondary-2 -n vault-secondary -- vault operator unseal $VAULT_UNSEAL_KEY_SECONDARY
-
