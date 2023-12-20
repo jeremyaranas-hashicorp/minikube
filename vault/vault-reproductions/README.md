@@ -222,7 +222,26 @@ Spin up TLS cluster
 ```
 ./postgresql-app-pod-02-tls.sh
 ```
-
+Confirm that cluster is using TLS by entering shell session in pod
+```
+kubectl exec -ti -n vault vault-0 -- sh
+```
+Check $VAULT_ADDR to confirm schema is using https
+```
+echo $VAULT_ADDR
+```
+Run `vault status`
+```
+vault status
+```
+Exit pod
+```
+exit
+```
+Check that secret was rendered to application pod
+```
+kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
+```
 
 ### Vault Agent with Dynamic Postgres Credentials
 
