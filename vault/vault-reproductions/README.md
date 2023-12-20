@@ -209,6 +209,21 @@ Spin up TLS cluster
 ./init_cluster_tls.sh
 ```
 
+### Vault Agent Injector with TLS
+Spin up TLS cluster
+`cd` to **setup** directory
+```
+./init_cluster_tls.sh
+```
+`cd` to **configure_components** directory
+```
+./vault-agent-tls.sh
+```
+```
+./postgresql-app-pod-02-tls.sh
+```
+
+
 ### Vault Agent with Dynamic Postgres Credentials
 
 ```

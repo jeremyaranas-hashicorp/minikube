@@ -79,3 +79,6 @@ kubectl create secret generic ${SECRET_NAME} \
     --from-file=vault.key=${TMPDIR}/vault.key \
     --from-file=vault.crt=${TMPDIR}/vault.crt \
     --from-file=vault.ca=${TMPDIR}/vault.ca
+
+# Kubernetes secret for Vault Agent Injector TLS 
+kubectl create secret generic ${SECRET_NAME} --from-file=vault.key=${TMPDIR}/vault.key --from-file=vault.crt=${TMPDIR}/vault.crt --from-file=vault.ca=${TMPDIR}/vault.ca
