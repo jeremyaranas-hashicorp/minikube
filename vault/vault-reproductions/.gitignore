@@ -1,2 +1,4 @@
 *.json
 sat.txt
+
+vault-values-transit-updated.yaml

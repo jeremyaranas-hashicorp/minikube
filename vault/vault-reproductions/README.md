@@ -292,11 +292,17 @@ kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --dec
 ./transit-init.sh
 ```
 ```
-cat token.json
-```
-Copy token and update token in seal config in helm_chart_value_files/vault-values-transit.yaml with token
-```
 ./vault-init.sh
+```
+Check that Vault pods are initialized and unsealed 
+```
+kubectl exec -ti vault-0 -- vault status
+```
+```
+kubectl exec -ti vault-1 -- vault status
+```
+```
+kubectl exec -ti vault-2 -- vault status
 ```
 
 ### Consul Backend

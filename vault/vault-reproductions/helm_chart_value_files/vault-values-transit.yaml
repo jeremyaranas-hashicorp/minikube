@@ -28,7 +28,7 @@ server:
           
         seal "transit" {
           address = "http://vault-auto-unseal-0.vault-auto-unseal-internal:8200"
-          token = "hvs.CAESIO-YBVWc3JHiSjGam8gxxgZISQP-0WhN8v2XJ8K-QevPGiAKHGh2cy44djZTa1hwRURXUUVTcXhYbndlT2hINDcQJQ"
+          token = "$TOKEN"
           disable_renewal = "false"
           key_name = "autounseal"
           mount_path = "transit/"
