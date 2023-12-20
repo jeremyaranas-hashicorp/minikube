@@ -209,6 +209,21 @@ Spin up TLS cluster
 ./init_cluster_tls.sh
 ```
 
+### Vault Agent Injector with TLS
+Spin up TLS cluster
+`cd` to **setup** directory
+```
+./init_cluster_tls.sh
+```
+`cd` to **configure_components** directory
+```
+./vault-agent-tls.sh
+```
+```
+./postgresql-app-pod-02-tls.sh
+```
+
+
 ### Vault Agent with Dynamic Postgres Credentials
 
 ```
@@ -268,6 +283,20 @@ cat /home/vault/config.json
 Retrieve k8s secret
 ```
 kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
+```
+
+### Vault Transit Auto-unseal
+
+`cd` to **setup** directory
+```
+./transit-init.sh
+```
+```
+cat token.json
+```
+Copy token and update token in seal config in helm_chart_value_files/vault-values-transit.yaml with token
+```
+./vault-init.sh
 ```
 
 ### Consul Backend
