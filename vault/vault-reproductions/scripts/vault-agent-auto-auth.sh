@@ -6,7 +6,6 @@
 
 # Login to Vault
 source ../main/common.sh
-login_to_vault
 create_test_sa_resources
 
 # Ensure OIDC discovery URLs 

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 source ../main/common.sh
-login_to_vault
 
 kubectl apply -f ../manifests/postgres-app-pod-03.yaml 
 
