@@ -13,7 +13,7 @@ spec:
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/role: 'test-role'
         vault.hashicorp.com/agent-inject-secret-password.txt: 'test/secret'
-        vault.hashicorp.com/tls-secret: 'vault-tls'
+        vault.hashicorp.com/tls-secret: 'vault-tls-agent'
         vault.hashicorp.com/ca-cert: '/vault/tls/vault.ca'
       labels:
         app: postgres

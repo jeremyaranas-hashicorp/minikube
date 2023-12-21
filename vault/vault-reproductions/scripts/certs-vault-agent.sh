@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-export SERVICE=vault-tls
-export NAMESPACE=vault
-export SECRET_NAME=vault-tls
-export TMPDIR=/tmp/vault
-export CSR_NAME=vault-csr
-export HELMNAME=vault
+export SERVICE=vault-tls-agent
+export NAMESPACE=default
+export SECRET_NAME=vault-tls-agent
+export TMPDIR=/tmp/vault-agent
+export CSR_NAME=vault-csr-agent
+export HELMNAME=vault-agent
 
-mkdir -p /tmp/vault
+mkdir -p /tmp/vault-agent
 
 # Create a key for Kubernetes to sign
 openssl genrsa -out ${TMPDIR}/vault.key 2048
@@ -75,12 +75,8 @@ sleep 5
 kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 -d > ${TMPDIR}/vault.ca
 sleep 5
 
-# Create namespace
-kubectl create namespace ${NAMESPACE}
-
 # Store the key, cert, and Kubernetes CA into Kubernetes secrets
 kubectl create secret generic ${SECRET_NAME} \
-    --namespace ${NAMESPACE} \
     --from-file=vault.key=${TMPDIR}/vault.key \
     --from-file=vault.crt=${TMPDIR}/vault.crt \
     --from-file=vault.ca=${TMPDIR}/vault.ca
