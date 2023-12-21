@@ -49,7 +49,6 @@ enable_dr_replication () {
 }
 
 configure_test_secrets_engine () {
-    login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault secrets list | grep -q test
     if [ $? -eq 0 ] 
     then 
@@ -62,7 +61,6 @@ configure_test_secrets_engine () {
 }
 
 enable_k8s_auth () {
-    login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault auth list | grep -q kubernetes
     if [ $? -eq 0 ] 
     then 
@@ -80,7 +78,6 @@ configure_k8s_auth () {
 }
 
 set_vault_policy () {
-    login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault policy list | grep -q test-policy
     if [ $? -eq 0 ] 
     then 
@@ -102,7 +99,6 @@ fi
 }
 
 configure_k8s_auth_role () {
-    login_to_vault
     kubectl exec -ti -n vault vault-0 -- vault list auth/kubernetes/role | grep -q test-role
     if [ $? -eq 0 ] 
     then 
@@ -158,19 +154,14 @@ install_vault_helm () {
         echo "INFO: Vault Helm chart already deployed" 
     else 
         echo "INFO: Installing Vault Helm chart"
-        helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_value_files/vault-values.yaml
+        helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_values_files/vault-values.yaml
     fi
 }
 
 install_vault_with_consul_helm () {
-    # helm ls -n vault | grep -q vault
-    # if [ $? -eq 0 ] 
-    # then 
-    #     echo "INFO: Vault Helm chart already deployed" 
-    # else 
-        echo "INFO: Installing Vault Helm chart"
-        helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_value_files/vault-consul-values.yaml
-    # fi
+    
+    echo "INFO: Installing Vault Helm chart"
+    helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_values_files/vault-consul-values.yaml
 }
 
 init_vault () {
@@ -199,7 +190,7 @@ install_vault_helm_secondary () {
         echo "INFO: Vault Helm chart already deployed" 
     else 
         echo "INFO: Installing Vault Helm chart"
-        helm install vault-secondary hashicorp/vault -n vault-secondary --create-namespace --values ../helm_chart_value_files/vault-values-secondary.yaml
+        helm install vault-secondary hashicorp/vault -n vault-secondary --create-namespace --values ../helm_chart_values_files/vault-values-secondary.yaml
     fi
 }
 

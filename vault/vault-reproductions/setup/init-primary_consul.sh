@@ -11,7 +11,7 @@ fi
 
 kubectl create ns vault
 
-helm install -n vault consul hashicorp/consul --values ../helm_chart_value_files/consul-values.yaml
+helm install -n vault consul hashicorp/consul --values ../helm_chart_values_files/consul-values.yaml
 
 set_ent_license
 install_vault_with_consul_helm

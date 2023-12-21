@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-./k8s_auth.sh
-
 source ../main/common.sh
-login_to_vault
+./k8s_auth.sh
 configure_test_secrets_engine
 enable_k8s_auth
 set_vault_policy

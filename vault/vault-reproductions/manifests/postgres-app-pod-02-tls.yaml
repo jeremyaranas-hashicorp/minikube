@@ -102,7 +102,3 @@ subjects:
   - kind: ServiceAccount  
     name: postgres-service-account  
     namespace: default
-
-
-
-
