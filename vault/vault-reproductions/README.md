@@ -48,7 +48,7 @@ Initialize secondary cluster (optional, only needed for replication)\
 ./csi_provider.sh
 ```
 
-Check that secret exist in app pod 
+Check that secret exists in app pod 
 ```
 kubectl exec -n vault csi-app-pod -- cat /mnt/secrets-store/test-object
 ```
