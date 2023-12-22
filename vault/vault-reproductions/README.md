@@ -251,6 +251,13 @@ Retrieve k8s secret
 kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
 ```
 
+### App Role
+
+```
+./app-role.sh
+```
+This script will enable app role and login using the role_id and secret_id to obtain a token
+
 ### Vault Transit Auto-unseal
 
 `cd` to **setup** directory
