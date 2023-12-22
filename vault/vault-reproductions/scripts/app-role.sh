@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-kubectl exec -ti -n vault vault-0 -- vault auth enable approle
+source ../main/common.sh
+configure_app-role 
 
 kubectl exec -ti -n vault vault-0 -- vault write auth/approle/role/my-app-role \
     secret_id_ttl=10m \

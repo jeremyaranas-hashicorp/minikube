@@ -294,3 +294,16 @@ set_ent_license_transit () {
         kubectl create secret generic vault-ent-license --from-literal="license=${secret}"
     fi
 }
+
+configure_app-role () {
+    kubectl exec -ti -n vault vault-0 -- vault auth list | grep -q approle
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: App role already exists" 
+    else 
+        echo "INFO: Configuring App role"
+        kubectl exec -ti -n vault vault-0 -- vault auth enable approle
+    fi
+}
+
+
