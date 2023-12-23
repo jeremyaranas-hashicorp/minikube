@@ -251,6 +251,10 @@ Retrieve k8s secret
 kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
 ```
 
+### LDAP 
+
+Run commands in ldap.sh
+
 ### App Role
 
 ```
