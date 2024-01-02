@@ -290,13 +290,13 @@ This script will enable app role and login using the role_id and secret_id to ob
 ```
 Check that Vault pods are initialized and unsealed 
 ```
-kubectl exec -ti vault-0 -- vault status
+kubectl exec -ti -n vault vault-0 -- vault status
 ```
 ```
-kubectl exec -ti vault-1 -- vault status
+kubectl exec -ti -n vault vault-1 -- vault status
 ```
 ```
-kubectl exec -ti vault-2 -- vault status
+kubectl exec -ti -n vault vault-2 -- vault status
 ```
 
 ### TLS
