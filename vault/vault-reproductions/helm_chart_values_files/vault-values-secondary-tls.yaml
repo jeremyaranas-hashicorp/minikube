@@ -2,6 +2,7 @@ global:
   enabled: true
   tlsDisable: false
 server:
+  logLevel: debug
   affinity: ""
   ha:
     apiAddr: "https://vault-secondary-active.vault-secondary.svc.cluster.local:8200"

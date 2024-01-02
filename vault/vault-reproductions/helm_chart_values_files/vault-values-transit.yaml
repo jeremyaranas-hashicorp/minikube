@@ -1,4 +1,5 @@
 server:
+  logLevel: debug
   affinity: ""
   ha:
     enabled: true
