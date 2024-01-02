@@ -282,7 +282,7 @@ This script will enable app role and login using the role_id and secret_id to ob
 
 `cd` to **setup** directory
 ```
-./transit-cluster.sh
+./init-transit-cluster.sh
 ```
 
 Check that Vault pods are initialized and unsealed 
