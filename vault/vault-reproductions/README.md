@@ -271,7 +271,6 @@ Read credential
 kubectl exec -ti -n vault vault-0 -- vault read ldap/static-cred/hashicorp-ldap
 ```
 
-
 ### App Role
 
 ```
@@ -283,11 +282,9 @@ This script will enable app role and login using the role_id and secret_id to ob
 
 `cd` to **setup** directory
 ```
-./transit-init.sh
+./transit-cluster.sh
 ```
-```
-./vault-init.sh
-```
+
 Check that Vault pods are initialized and unsealed 
 ```
 kubectl exec -ti -n vault vault-0 -- vault status

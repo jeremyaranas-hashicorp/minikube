@@ -28,3 +28,8 @@ kubectl exec -ti -n vault vault-auto-unseal-0 -- vault token create -orphan -pol
 export TOKEN=$(jq -r ".auth.client_token" token.json)
 rm -f ../helm_chart_values_files/vault-values-transit-updated.yaml
 envsubst < ../helm_chart_values_files/vault-values-transit.yaml > ../helm_chart_values_files/vault-values-transit-updated.yaml
+
+helm install -n vault vault hashicorp/vault --values ../helm_chart_values_files/vault-values-transit-updated.yaml 
+set_ent_license_transit
+init_vault_using_auto_unseal
+sleep 10
