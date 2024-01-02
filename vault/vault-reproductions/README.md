@@ -251,6 +251,27 @@ Retrieve k8s secret
 kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
 ```
 
+### LDAP 
+
+```
+./ldap_auth.sh
+```
+
+Login using LDAP auth
+```
+kubectl exec -ti -n vault vault-0 -- vault login -method=ldap -path=ldap username="user01" password=password01
+```
+
+```
+./ldap_secrets_engine.sh
+```
+
+Read credential
+```
+kubectl exec -ti -n vault vault-0 -- vault read ldap/static-cred/hashicorp-ldap
+```
+
+
 ### App Role
 
 ```
