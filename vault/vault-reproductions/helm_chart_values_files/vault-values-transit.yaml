@@ -1,6 +1,17 @@
+global:
+  enabled: true
+  tlsDisable: true
+csi:  
+  enabled: true
+injector:
+  enabled: true
+  logLevel: debug
 server:
   logLevel: debug
   affinity: ""
+  auditStorage:
+    enabled: true
+    mountPath: "/vault/audit"
   ha:
     enabled: true
     replicas: 3
@@ -37,8 +48,24 @@ server:
         }   
   image:
     repository: hashicorp/vault-enterprise
-    tag: 1.15.2-ent
+    tag: $VERSION
   enterpriseLicense:
     secretName: vault-ent-license
-injector:
-  enabled: false
+  extraEnvironmentVars:
+  readinessProbe:
+    enabled: false
+    path: '/v1/sys/health?standbyok=true&perfstandbyok=true'
+  livenessProbe:
+    enabled: false
+    path: '/v1/sys/health?standbyok=true&perfstandbyok=true'
+ui:
+  # Use minikube service command to expose service
+  enabled: true
+  publishNotReadyAddresses: true
+  activeVaultPodOnly: false
+  serviceType: "LoadBalancer"
+  serviceNodePort: null
+  externalPort: 8200
+  targetPort: 8200
+
+  

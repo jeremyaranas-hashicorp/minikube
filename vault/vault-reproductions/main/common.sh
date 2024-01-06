@@ -154,14 +154,14 @@ install_vault_helm () {
         echo "INFO: Vault Helm chart already deployed" 
     else 
         echo "INFO: Installing Vault Helm chart"
-        helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_values_files/vault-values.yaml
+        helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_values_files/vault-values-updated.yaml
     fi
 }
 
 install_vault_with_consul_helm () {
     
     echo "INFO: Installing Vault Helm chart"
-    helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_values_files/vault-consul-values.yaml
+    helm install vault hashicorp/vault -n vault --create-namespace --values ../helm_chart_values_files/vault-consul-values-updated.yaml
 }
 
 init_vault () {
@@ -190,7 +190,7 @@ install_vault_helm_secondary () {
         echo "INFO: Vault Helm chart already deployed" 
     else 
         echo "INFO: Installing Vault Helm chart"
-        helm install vault-secondary hashicorp/vault -n vault-secondary --create-namespace --values ../helm_chart_values_files/vault-values-secondary.yaml
+        helm install vault-secondary hashicorp/vault -n vault-secondary --create-namespace --values ../helm_chart_values_files/vault-values-secondary-updated.yaml
     fi
 }
 

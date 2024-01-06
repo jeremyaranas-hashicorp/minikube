@@ -1,9 +1,17 @@
 global:
   enabled: true
   tlsDisable: true
+csi:  
+  enabled: true
+injector:
+  enabled: true
+  logLevel: debug
 server:
   logLevel: debug
   affinity: ""
+  auditStorage:
+    enabled: true
+    mountPath: "/vault/audit"
   ha:
     apiAddr: "http://vault-secondary-active.vault-secondary.svc.cluster.local:8200"
     clusterAddr: "http://$(HOSTNAME).vault-secondary-internal.vault-secondary.svc.cluster.local:8201"
@@ -35,7 +43,7 @@ server:
         }
   image:
     repository: hashicorp/vault-enterprise
-    tag: 1.15.2-ent
+    tag: $VERSION
   enterpriseLicense:
     secretName: vault-ent-license
   readinessProbe:

@@ -19,7 +19,7 @@ server:
     replicas: 1
   image:
     repository: hashicorp/vault-enterprise
-    tag: 1.15.2-ent
+    tag: $VERSION
   enterpriseLicense:
     secretName: vault-ent-license
   extraEnvironmentVars:
