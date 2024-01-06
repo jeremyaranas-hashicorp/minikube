@@ -29,8 +29,9 @@ minikube start
 Initialize primary cluster\
 `cd` to **setup** directory
 ```
-./raft-primary.sh
+./init.sh
 ```
+Follow prompts to set up environment
 
 Initialize secondary cluster (optional, only needed for replication)\
 `cd` to **setup** directory
@@ -282,8 +283,9 @@ This script will enable app role and login using the role_id and secret_id to ob
 
 `cd` to **setup** directory
 ```
-./transit-primary.sh
+./init.sh
 ```
+Follow prompts to set up environment
 
 Check that Vault pods are initialized and unsealed 
 ```
@@ -301,15 +303,18 @@ kubectl exec -ti -n vault vault-2 -- vault status
 Spin up TLS cluster
 `cd` to **setup** directory
 ```
-./tls_cluster.sh
+./init.sh
 ```
+Follow prompts to set up environment
 
 ### Vault Agent Injector with TLS
 Spin up TLS cluster
 `cd` to **setup** directory
 ```
-./tls_cluster.sh
+./init.sh
 ```
+Follow prompts to set up environment
+
 `cd` to **scripts** directory
 ```
 ./vault-agent-tls.sh
@@ -340,8 +345,9 @@ kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
 Deploy Vault Helm chart
 `cd` to **setup** directory
 ```
-./consul-primary.sh
+./init.sh
 ```
+Follow prompts to set up environment
 
 Check that Vault is using Consul 
 ```
