@@ -240,14 +240,14 @@ init_vault_auto_unseal () {
     do
     sleep 1
     done
-    echo 'INFO: Initializing vault-auto-unseal-0'
+    echo 'INFO: Initializing vault-0'
     sleep 5
     kubectl exec -n vault vault-auto-unseal-0 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init-auto-unseal.json
     sleep 5
 }
 
 unseal_vault_auto_unseal () {
-    echo 'INFO: Unsealing vault-auto-unseal-0'
+    echo 'INFO: Unsealing vault-0'
     export VAULT_UNSEAL_KEY_AUTO_UNSEAL=$(jq -r ".unseal_keys_b64[]" init-auto-unseal.json)
     kubectl exec -n vault vault-auto-unseal-0 -- vault operator unseal $VAULT_UNSEAL_KEY_AUTO_UNSEAL
     sleep 5
@@ -267,7 +267,7 @@ init_vault_using_auto_unseal () {
     done
     echo 'INFO: Initializing vault-0'
     sleep 5
-    kubectl exec -n vault vault-0 -- vault operator init > init.json
+    kubectl exec -n vault vault-0 -- vault operator init -recovery-shares=1 -recovery-threshold=1 -format=json > init.json
     sleep 5
 }
 

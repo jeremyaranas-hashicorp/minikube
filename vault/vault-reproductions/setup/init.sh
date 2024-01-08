@@ -17,14 +17,14 @@ envsubst < ../helm_chart_values_files/vault-values-transit.yaml > ../helm_chart_
 cat << EOF
 Current Options
 -----------------
-1) Raft with auto-unseal (via Transit) 
-2) Raft with Shamir
-3) Consul with Shamir
-4) Raft with Shamir and TLS 
+1) Vault primary cluster, Raft, auto-unseal (via Transit) 
+2) Vault primary cluster, Raft, Shamir
+3) Vault primary cluster, Consul, Shamir
+4) Vault primary and secondary clusters, Raft, Shamir, TLS
 -----------------
 EOF
 
-echo "Enter an option (e.g. 1, 2, etc.): "
+echo "Enter an option (e.g. 1, 2): "
 read OPTION
 
 # Run script based on config options
