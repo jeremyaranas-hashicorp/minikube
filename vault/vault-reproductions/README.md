@@ -75,8 +75,13 @@ Test login using long-lived token from service account
 ```
 SA_JWT=$(kubectl get secret test-secret -n vault -o go-template='{{ .data.token }}' | base64 --decode)
 ```
+HTTP
 ```
 kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$SA_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login
+```
+HTTPS
+```
+kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$SA_JWT'", "role": "test-role"}' https://127.0.0.1:8200/v1/auth/kubernetes/login
 ```
 
 Deploy app pod to test k8s auth 
@@ -90,8 +95,13 @@ APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kub
 ```
 
 Authenticate from app pod to Vault using local JWT
+HTTP
 ```
 kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-ui.vault.svc.cluster.local:8200/v1/auth/kubernetes/login
+```
+HTTPS
+```
+kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' https://vault-ui.vault.svc.cluster.local:8200/v1/auth/kubernetes/login
 ```
 
 ### Kubernetes Auth Method with External Vault
