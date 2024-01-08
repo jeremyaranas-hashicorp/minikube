@@ -25,7 +25,7 @@ enable_performance_replication_tls () {
         kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/performance/primary/enable
         kubectl exec -ti -n vault vault-0 -- vault write sys/replication/performance/primary/secondary-token id="secondary" -format=json  | jq -r .wrap_info.token > sat.txt
         login_to_vault_secondary
-        kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) ca_file=/tmp/vault-secondary/vault.ca
+        kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
     fi
 }
 
