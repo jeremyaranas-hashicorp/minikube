@@ -247,10 +247,16 @@ kubectl exec -ti postgres-<pod> -- cat /vault/secrets/password.txt
 ```
 
 Configure Vault Agent with JWT auto-auth
+
+HTTP
 ```
 ./vault-agent-jwt-auto-auth.sh
 ```
 
+HTTPS
+```
+./vault-agent-jwt-auto-auth_tls.sh
+```
 Check that config.json is rendered
 ```
 kubectl exec -ti postgres-<12345> -c vault-agent -- cat /home/vault/config.json

@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'test-role'
+        vault.hashicorp.com/agent-inject-secret-password.txt: 'test/secret'
+        # Annotations for jwt auth method auto-auth (uncomment to set up k8s auth method auto-auth)
+        vault.hashicorp.com/auth-path: auth/jwt
+        vault.hashicorp.com/auth-type: jwt
+        vault.hashicorp.com/auth-config-path: /var/run/secrets/kubernetes.io/serviceaccount/token
+        vault.hashicorp.com/auth-config-remove_jwt_after_reading: 'false'
+        vault.hashicorp.com/tls-secret: 'vault-tls-agent'
+        vault.hashicorp.com/ca-cert: '/vault/tls/vault.ca'
+      labels:
+        app: postgres
+    spec:
+      serviceAccountName: postgres-service-account
+      containers:
+        - name: postgres
+          image: postgres:10.1 
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432  
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: postgresql
+  POSTGRES_USER: root
+  POSTGRES_PASSWORD: rootpassword
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgres-pv-volume  
+  labels:
+    type: local 
+    app: postgres
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi 
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pv-claim  
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany  
+  resources:
+    requests:
+      storage: 5Gi  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres 
+  labels:
+    app: postgres 
+spec:
+  type: NodePort 
+  ports:
+    - port: 5432 
+  selector:
+    app: postgres
+---
+apiVersion: rbac.authorization.k8s.io/v1  
+kind: ClusterRoleBinding  
+metadata:  
+  name: postgres-token-review-clusterrolebindings  
+roleRef:  
+  apiGroup: rbac.authorization.k8s.io  
+  kind: ClusterRole  
+  name: system:auth-delegator  
+subjects: 
+  - kind: ServiceAccount  
+    name: postgres-service-account  
+    namespace: default
