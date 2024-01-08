@@ -45,8 +45,13 @@ Initialize secondary cluster (optional, only needed for replication)\
 
 ### CSI Provider
 
+HTTP
 ```
 ./csi_provider.sh
+```
+HTTPS
+```
+./csi_provider_tls.sh
 ```
 
 Check that secret exists in app pod 
@@ -253,10 +258,14 @@ kubectl exec -ti postgres-<12345> -c vault-agent -- cat /home/vault/config.json
 
 ### Vault Secrets Operator
 
+HTTP
 ```
 ./vault-secrets-operator.sh
 ```
-
+HTTPS
+```
+./vault-secrets-operator_tls.sh
+```
 Retrieve k8s secret
 ```
 kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
