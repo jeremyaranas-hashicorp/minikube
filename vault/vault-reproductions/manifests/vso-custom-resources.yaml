@@ -14,6 +14,7 @@ metadata:
   name: static-auth
   namespace: vso
 spec:
+  vaultConnectionRef: vault-connection
   # Auth method to use when authenticating to Vault
   method: kubernetes
   # Auth method mount 
