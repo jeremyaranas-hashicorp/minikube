@@ -15,7 +15,7 @@ sleep 5
 echo 'INFO: Generating certificates for Vault primary'
 ../scripts/certs.sh
 set_ent_license
-helm install vault hashicorp/vault -f ../helm_chart_values_files/-updated.yaml -n vault
+helm install vault hashicorp/vault -f ../helm_chart_values_files/vault-values-tls-updated.yaml -n vault
 init_vault
 unseal_vault
 
@@ -40,7 +40,7 @@ sleep 5
 echo 'INFO: Generating certificates for Vault secondary'
 ../scripts/certs-secondary.sh
 set_ent_license_secondary
-helm install vault-secondary hashicorp/vault -f ../helm_chart_values_files/-updated.yaml -n vault-secondary
+helm install vault-secondary hashicorp/vault -f ../helm_chart_values_files/vault-values-secondary-tls-updated.yaml -n vault-secondary
 init_vault_secondary
 unseal_vault_secondary
 

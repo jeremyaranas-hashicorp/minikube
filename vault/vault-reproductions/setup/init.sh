@@ -20,7 +20,7 @@ Current Options
 1) Raft with auto-unseal (via Transit) 
 2) Raft with Shamir
 3) Consul with Shamir
-4) Raft with Shamir and TLS [NEED TO FIX]
+4) Raft with Shamir and TLS 
 -----------------
 EOF
 
