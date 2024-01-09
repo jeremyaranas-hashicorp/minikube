@@ -26,18 +26,12 @@ Start Minikube cluster
 minikube start
 ```
 
-Initialize primary cluster\
+Initialize cluster\
 `cd` to **setup** directory
 ```
-./init.sh
+./init-v2.sh
 ```
 Follow prompts to set up environment
-
-Initialize secondary cluster (optional, only needed for replication)\
-`cd` to **setup** directory
-```
-./raft-secondary.sh
-```
 
 # Reproduction Scenarios
 
