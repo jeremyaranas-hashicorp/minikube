@@ -13,12 +13,15 @@ server:
     enabled: true
     mountPath: "/vault/audit"
   ha:
+    apiAddr: "http://vault-active.vault.svc.cluster.local:8200"
+    clusterAddr: "http://$(HOSTNAME).vault-internal.vault.svc.cluster.local:8201"  
     enabled: true
     replicas: 3
     raft: 
       enabled: true
       config: | 
         ui = true
+        service_registration "kubernetes" {}
         listener "tcp" {
           tls_disable = 1
           address = "[::]:8200"
