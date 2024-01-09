@@ -54,9 +54,22 @@ enable_dr_replication () {
         kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/dr/primary/enable
         kubectl exec -ti -n vault vault-0 -- vault write sys/replication/dr/primary/secondary-token id="secondary" -format=json  | jq -r .wrap_info.token > sat.txt
         login_to_vault_secondary
-        # TLS
-        # kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/performance/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
         kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/dr/secondary/enable token=$(cat sat.txt) 
+    fi
+}
+
+enable_dr_replication_tls () {
+    login_to_vault
+    kubectl exec -ti -n vault vault-0 -- vault read sys/replication/status -format=json | jq .data.dr.mode | grep -q primary
+    if [ $? -eq 0 ] 
+    then 
+        echo "INFO: DR replication is already configured" 
+    else 
+        echo "INFO: Enabling DR replication" 
+        kubectl exec -ti -n vault vault-0 -- vault write -f sys/replication/dr/primary/enable
+        kubectl exec -ti -n vault vault-0 -- vault write sys/replication/dr/primary/secondary-token id="secondary" -format=json  | jq -r .wrap_info.token > sat.txt
+        login_to_vault_secondary
+        kubectl exec -ti -n vault-secondary vault-secondary-0 -- vault write sys/replication/dr/secondary/enable token=$(cat sat.txt) ca_file=/vault/vault-tls/vault.ca
     fi
 }
 

@@ -200,14 +200,25 @@ kubectl exec -ti -n vault alpine -- curl -vv --request POST --data '{"jwt": "'$A
 ### Replication
 
 Enable PR replication 
+HTTP
 ```
 ./performance-replication.sh
 ``` 
-
+HTTPS
+```
+./performance-replication-tls.sh
+```
 Enable DR replication
+HTTP
 ```
 ./dr-replication.sh
 ``` 
+HTTPS
+```
+./dr-replication-tls.sh
+```
+
+
 
 ### Vault Agent with Dynamic Postgres Credentials
 
