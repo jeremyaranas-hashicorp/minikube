@@ -21,8 +21,10 @@ helm repo update
 
 # About This Environment
 
-* Audit logs are written to /vault/audit/audit.log 
-* Note that any files in /tmp/vault /tmp/vault-agent or /tmp/vault-secondary will be removed
+* The Vault pods in the primary cluster are deployed in the *vault* namespace
+* The Vault pods in the secondary cluster are deployed in the *vault-secondary* namespace
+* Audit logs are written to */vault/audit/audit.log* 
+* Note that any files in */tmp/vault /tmp/vault-agent* or */tmp/vault-secondary* will be removed when deploying the TLS environment since the certificates are generated and saved in these directories
 * The secondary cluster uses Raft as the storage backend and Shamir unseal 
   
 ## Init Keys
@@ -51,6 +53,8 @@ Follow prompts to set up environment
 
 ## CSI Provider
 
+This script configures the Vault CSI Provider and enables the csi-app-pod application pod to consume Vault secrets using the CSI secrets store volume.
+
 ```
 ./csi_provider.sh
 ```
@@ -69,20 +73,24 @@ kubectl exec -n vault csi-app-pod -- cat /mnt/secrets-store/test-object
 
 ## JWT Auth Method Using Kubernetes as OIDC Provider
 
+This script configures the JWT auth method and enables a user to login using the test-role role and service account token.
+
 ```
 ./jwt_auth.sh
 ```
-Test login to Vault using JWT auth method
+Login to Vault using JWT auth method
 ```
 kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/login role=test-role jwt=@/var/run/secrets/kubernetes.io/serviceaccount/token
 ```
 
 ## Kubernetes Auth Method
 
+This script configures the Kubernetes auth method and enables authentication to Vault using a service account token.
+
 ```
 ./k8s_auth.sh
 ```
-Test login to Vault using long-lived token from service account
+Login to Vault using service account token
 ```
 SA_JWT=$(kubectl get secret test-secret -n vault -o go-template='{{ .data.token }}' | base64 --decode)
 ```
@@ -93,7 +101,7 @@ kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$S
 ```
 ./k8s_auth.sh
 ```
-Test login to Vault using long-lived token from service account
+Login to Vault using service account token 
 ```
 SA_JWT=$(kubectl get secret test-secret -n vault -o go-template='{{ .data.token }}' | base64 --decode)
 ```
@@ -103,14 +111,16 @@ kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$S
 
 ### Deploy App Pod to Test k8s Auth 
 
+This script configures an alpine application pod and enables login to Vault using the application pod's service account token.
+
 ```
 ./k8s_auth-app-pod.sh
 ```
-Export app pod local JWT
+Export application pod service account token
 ```
 APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 ```
-Authenticate from app pod to Vault using local JWT
+Authenticate from application pod to Vault using JWT
 ```
 kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-ui.vault.svc.cluster.local:8200/v1/auth/kubernetes/login
 ```
@@ -118,11 +128,11 @@ kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$AP
 ```
 ./k8s_auth-app-pod.sh
 ```
-Export app pod local JWT
+Export application pod service account token
 ```
 APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 ```
-Authenticate from app pod to Vault using local JWT
+Authenticate from application pod to Vault using JWT
 ```
 kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' https://vault-ui.vault.svc.cluster.local:8200/v1/auth/kubernetes/login
 ```
@@ -217,6 +227,8 @@ kubectl exec -ti -n vault alpine -- curl -vv --request POST --data '{"jwt": "'$A
 
 ## Replication
 
+These scripts configure replication from the primary to secondary clusters.
+
 Enable PR replication 
 ```
 ./performance-replication.sh
@@ -236,10 +248,12 @@ Enable DR replication
 
 ## Vault Agent
 
+This script configures the Vault Agent and enables the postgres-<12345> application pod to read secrets rendered by the Vault Agent to a shared volume.
+
 ```
 ./vault-agent.sh
 ```
-Check that secret was rendered in app pod
+Check that secret was rendered in application pod
 ```
 kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
 ```
@@ -247,17 +261,19 @@ kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
 ```
 ./vault-agent-tls.sh
 ```
-Check that secret was rendered in app pod
+Check that secret was rendered in application pod
 ```
 kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
 ```
 
 ### Vault Agent with Dynamic Postgres Credentials
 
+This script configures the Vault Agent and enables the orgchart-<123> application pod to read secrets rendered by the Vault Agent to a shared volume that are dynamically updated in the postgres application pod.
+
 ```
 ./vault-agent-injector-dynamic-postgres-creds.sh
 ```
-Check that credentials are automatically updated in sample application pod
+Check that credentials are automatically updated in application pod
 ```
 kubectl exec -ti -n vault orgchart-<123> -- sh
 ```
@@ -265,7 +281,7 @@ Check database-creds.txt to see credentials update
 ```
 watch -n 1 cat /vault/secrets/database-creds.txt
 ```
-Check that credentials are renewed in Postgres pod
+Check that credentials are renewed in Postgres application pod
 ```
 kubectl exec -ti postgres -- sh
 ```
@@ -276,10 +292,12 @@ while :; do psql -U root -c "SELECT usename, valuntil FROM pg_user;"; sleep 1; d
 
 ### Configure Vault Agent with JWT auto-auth
 
+This script configures the Vault Agent with JWT auto-auth and enables authentication from an postgres-<12345> application pod.
+
 ```
 ./vault-agent-jwt-auto-auth.sh
 ```
-Check that config.json is rendered
+Check that config.json is rendered with JWT auth
 ```
 kubectl exec -ti postgres-<12345> -c vault-agent -- cat /home/vault/config.json
 ```
@@ -287,12 +305,14 @@ kubectl exec -ti postgres-<12345> -c vault-agent -- cat /home/vault/config.json
 ```
 ./vault-agent-jwt-auto-auth_tls.sh
 ```
-Check that config.json is rendered
+Check that config.json is rendered with JWT auth
 ```
 kubectl exec -ti postgres-<12345> -c vault-agent -- cat /home/vault/config.json
 ```
 
 ## Vault Secrets Operator
+
+This script configures the Vault Secrets Operator and syncs a Vault secret to a Kubernetes secret.
 
 ```
 ./vault-secrets-operator.sh
@@ -312,6 +332,8 @@ kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --dec
 
 ## LDAP 
 
+This script configures LDAP auth method and enables login to Vault via using credentials from an OpenLDAP server.
+
 ```
 ./ldap_auth.sh
 ```
@@ -320,6 +342,9 @@ Login using LDAP auth
 kubectl exec -ti -n vault vault-0 -- vault login -method=ldap -path=ldap username="user01" password=password01
 ```
 ```
+
+This script configures LDAP secrets engine and allows a user to request credentials for a role.
+
 ./ldap_secrets_engine.sh
 ```
 Read credential
@@ -329,10 +354,11 @@ kubectl exec -ti -n vault vault-0 -- vault read ldap/static-cred/hashicorp-ldap
 
 ## App Role
 
+This script configures AppRole auth method and allows a user to log into Vault using the role_id and secret_id to obtain a token.
+
 ```
 ./app-role.sh
 ```
-This script will enable app role and login using the role_id and secret_id to obtain a token
 
 # Sources
 
