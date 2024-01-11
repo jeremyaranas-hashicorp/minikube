@@ -18,25 +18,7 @@ while [[ $(kubectl get pods -l app.kubernetes.io/name=openldap-secrets-engine -o
     echo 'INFO: OpenLDAP container started'
     sleep 5
 
-# Enable LDAP secrets engine
-kubectl exec -ti -n vault vault-0 -- vault secrets enable ldap
+enable_ldap_secrets_engine
+write_ldap_secrets_engine_config
+create_ldap_secrets_engine_static_role
 
-# Write LDAP secrets engine config 
-kubectl exec -ti -n vault vault-0 -- vault write ldap/config \
-    binddn="cn=admin,dc=example,dc=org" \
-    bindpass=adminpassword \
-    url="ldap://openldap-secrets-engine.default.svc.cluster.local:1389"
-
-# Create static role
-kubectl exec -ti -n vault vault-0 -- vault write ldap/static-role/hashicorp-ldap \
-    dn='cn=user01,ou=users,dc=example,dc=org' \
-    username='user01' \
-    rotation_period="24h"
-
-# Deploy Alpine pod and install openldap-clients to perform to use LDAP utilities such as LDAP search
-# This is for testing
-
-# ./application_pod.sh
-# apk update
-# apk add openldap-clients
-# ldapsearch -x -H ldap://openldap.default.svc.cluster.local:1389 -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w adminpassword

@@ -31,8 +31,8 @@ helm repo update
 
 * Vault init keys can be found in the following files in the setup directory
   * init.json (primary cluster)  
-  * init-secondary.json (secondary cluster)
-  * init-auto-unseal.json (Transit cluster)
+  * init_secondary.json (secondary cluster)
+  * init_auto_unseal.json (Transit cluster)
 
 # Deploy Vault cluster in Kubernetes
 
@@ -114,7 +114,7 @@ kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$S
 This script configures an alpine application pod and enables login to Vault using the application pod's service account token.
 
 ```
-./k8s_auth-app-pod.sh
+./k8s_auth_app_pod.sh
 ```
 Export application pod service account token
 ```
@@ -126,7 +126,7 @@ kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$AP
 ```
 **TLS**
 ```
-./k8s_auth-app-pod.sh
+./k8s_auth_app_pod.sh
 ```
 Export application pod service account token
 ```
@@ -231,19 +231,19 @@ These scripts configure replication from the primary to secondary clusters.
 
 Enable PR replication 
 ```
-./performance-replication.sh
+./performance_replication.sh
 ``` 
 **TLS**
 ```
-./performance-replication-tls.sh
+./performance_replication_tls.sh
 ```
 Enable DR replication
 ```
-./dr-replication.sh
+./dr_replication.sh
 ``` 
 **TLS**
 ```
-./dr-replication-tls.sh
+./dr_replication_tls.sh
 ```
 
 ## Vault Agent
@@ -251,7 +251,7 @@ Enable DR replication
 This script configures the Vault Agent and enables the postgres-<12345> application pod to read secrets rendered by the Vault Agent to a shared volume.
 
 ```
-./vault-agent.sh
+./vault_agent.sh
 ```
 Check that secret was rendered in application pod
 ```
@@ -259,7 +259,7 @@ kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
 ```
 **TLS**
 ```
-./vault-agent-tls.sh
+./vault_agent_tls.sh
 ```
 Check that secret was rendered in application pod
 ```
@@ -271,7 +271,7 @@ kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
 This script configures the Vault Agent and enables the orgchart-<123> application pod to read secrets rendered by the Vault Agent to a shared volume that are dynamically updated in the postgres application pod.
 
 ```
-./vault-agent-injector-dynamic-postgres-creds.sh
+./vault_agent_injector_dynamic_postgres_creds.sh
 ```
 Check that credentials are automatically updated in application pod
 ```
@@ -295,7 +295,7 @@ while :; do psql -U root -c "SELECT usename, valuntil FROM pg_user;"; sleep 1; d
 This script configures the Vault Agent with JWT auto-auth and enables authentication from an postgres-<12345> application pod.
 
 ```
-./vault-agent-jwt-auto-auth.sh
+./vault_agent_jwt_auto_auth.sh
 ```
 Check that config.json is rendered with JWT auth
 ```
@@ -303,7 +303,7 @@ kubectl exec -ti postgres-<12345> -c vault-agent -- cat /home/vault/config.json
 ```
 **TLS**
 ```
-./vault-agent-jwt-auto-auth_tls.sh
+./vault_agent_jwt_auto_auth_tls.sh
 ```
 Check that config.json is rendered with JWT auth
 ```
@@ -315,7 +315,7 @@ kubectl exec -ti postgres-<12345> -c vault-agent -- cat /home/vault/config.json
 This script configures the Vault Secrets Operator and syncs a Vault secret to a Kubernetes secret.
 
 ```
-./vault-secrets-operator.sh
+./vault_secrets_operator.sh
 ```
 Retrieve k8s secret
 ```
@@ -323,7 +323,7 @@ kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --dec
 ```
 **TLS**
 ```
-./vault-secrets-operator_tls.sh
+./vault_secrets_operator_tls.sh
 ```
 Retrieve k8s secret
 ```
@@ -357,7 +357,20 @@ kubectl exec -ti -n vault vault-0 -- vault read ldap/static-cred/hashicorp-ldap
 This script configures AppRole auth method and allows a user to log into Vault using the role_id and secret_id to obtain a token.
 
 ```
-./app-role.sh
+./app_role.sh
+```
+
+Login to Vault using AppRole
+```
+ROLE_ID=$(kubectl exec -ti -n vault vault-0 -- vault read -format=json auth/approle/role/my-app-role/role-id | jq -r .data.role_id)
+```
+```
+SECRET_ID=$(kubectl exec -ti -n vault vault-0 -- vault write -format=json -f auth/approle/role/my-app-role/secret-id | jq -r .data.secret_id)
+```
+```
+kubectl exec -ti -n vault vault-0 -- vault write auth/approle/login \
+    role_id=$ROLE_ID \
+    secret_id=$SECRET_ID
 ```
 
 # Sources

@@ -15,7 +15,7 @@ sleep 5
 echo 'INFO: Generating certificates for Vault primary'
 ../scripts/certs.sh
 set_ent_license
-helm install vault hashicorp/vault -f ../helm_chart_values_files/vault-values-tls-updated.yaml -n vault
+helm install vault hashicorp/vault -f ../helm-chart-values-files/vault-values-tls-updated.yaml -n vault
 init_vault
 unseal_vault
 
@@ -23,7 +23,7 @@ echo 'INFO: Removing existing certificates in /tmp/vault-agent'
 rm -fr /tmp/vault-agent
 sleep 5
 echo 'INFO: Generating certificates for Vault agent'
-../scripts/certs-vault-agent.sh
+../scripts/certs_vault_agent.sh
 
 export VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" init.json)
 

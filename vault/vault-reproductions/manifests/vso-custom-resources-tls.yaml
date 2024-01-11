@@ -4,7 +4,6 @@ metadata:
   namespace: vso
   name: vault-connection
 spec:
-  # address to the Vault server.
   address: https://vault.vault.svc.cluster.local:8200
   skipTLSVerify: true
 ---
@@ -15,14 +14,10 @@ metadata:
   namespace: vso
 spec:
   vaultConnectionRef: vault-connection
-  # Auth method to use when authenticating to Vault
   method: kubernetes
-  # Auth method mount 
   mount: kubernetes
   kubernetes:
-    # Vault role to use when authenticating to Vault
     role: test-role
-    # ServiceAccount to use when authenticating to Vault
     serviceAccount: default
     audiences:
       - vault
@@ -34,15 +29,10 @@ metadata:
   namespace: vso
 spec:
   type: kv-v2
-  # Mount path of kv secrets engine
   mount: test
-  # Path of the secret
   path: secret
-  # k8s secret location
   destination:
     name: secretkv
     create: true
-  # Static secret refresh interval
   refreshAfter: 30s
-  # Name of the CRD to authenticate to Vault
   vaultAuthRef: static-auth

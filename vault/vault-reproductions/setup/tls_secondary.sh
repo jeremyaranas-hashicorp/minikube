@@ -13,13 +13,13 @@ echo 'INFO: Removing existing certificates in /tmp/vault-secondary'
 rm -fr /tmp/vault-secondary
 sleep 5
 echo 'INFO: Generating certificates for Vault secondary'
-../scripts/certs-secondary.sh
+../scripts/certs_secondary.sh
 set_ent_license_secondary
-helm install vault-secondary hashicorp/vault -f ../helm_chart_values_files/vault-values-secondary-tls-updated.yaml -n vault-secondary
+helm install vault-secondary hashicorp/vault -f ../helm-chart-values-files/vault-values-secondary-tls-updated.yaml -n vault-secondary
 init_vault_secondary
 unseal_vault_secondary
 
-export VAULT_UNSEAL_KEY_SECONDARY=$(jq -r ".unseal_keys_b64[]" init-secondary.json)
+export VAULT_UNSEAL_KEY_SECONDARY=$(jq -r ".unseal_keys_b64[]" init_secondary.json)
 
 sleep 10
 echo 'INFO: Waiting for active node to be initialized'

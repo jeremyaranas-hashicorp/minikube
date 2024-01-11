@@ -5,9 +5,7 @@
 source ../main/common.sh
 ./k8s_auth.sh
 ../setup/application_pod.sh
-
-# Write config
-kubectl exec -ti -n vault vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://10.96.0.1:443" disable_local_ca_jwt=false
+write_k8s_auth_config
 
 # With disable_local_ca_jwt=true
 

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-kubectl apply -f ../manifests/sample_application.yaml
+kubectl apply -f ../manifests/sample-application.yaml
