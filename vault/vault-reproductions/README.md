@@ -26,7 +26,21 @@ helm repo update
 * Audit logs are written to */vault/audit/audit.log* 
 * Note that any files in */tmp/vault /tmp/vault-agent* or */tmp/vault-secondary* will be removed when deploying the TLS environment since the certificates are generated and saved in these directories
 * The secondary cluster uses Raft as the storage backend and Shamir unseal 
+* The minimum Vault version required when deploying via the Vault Helm charts is 1.10.0-ent
   
+## Access Vault Clusters
+
+* Access to Vault cluster(s) can be done using the `kubectl` command line
+
+Primary cluster
+```
+kubectl exec -ti -n vault vault-0 -- sh
+```
+Secondary
+```
+kubectl exec -ti -n vault-secondary vault-secondary-0 -- sh
+```
+
 ## Init Keys
 
 * Vault init keys can be found in the following files in the setup directory
@@ -34,7 +48,7 @@ helm repo update
   * init_secondary.json (secondary cluster)
   * init_auto_unseal.json (Transit cluster)
 
-# Deploy Vault cluster in Kubernetes
+# Deploy Vault Cluster in Kubernetes
 
 Start Minikube cluster
 ```
@@ -49,7 +63,10 @@ Follow prompts to set up environment
 
 # Reproduction Scenarios
 
+The following scenarios have been tested on Vault `1.15.2-ent`
+
 `cd` to **scripts** directory
+
 
 ## CSI Provider
 
@@ -372,8 +389,3 @@ kubectl exec -ti -n vault vault-0 -- vault write auth/approle/login \
     role_id=$ROLE_ID \
     secret_id=$SECRET_ID
 ```
-
-# Sources
-
-* https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/standalone-tls
-* https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-minikube-tls#create-the-certificate
