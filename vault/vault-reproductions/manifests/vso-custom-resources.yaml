@@ -1,0 +1,38 @@
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  namespace: vso
+  name: vault-connection
+spec:
+  address: http://vault.vault.svc.cluster.local:8200
+  skipTLSVerify: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: static-auth
+  namespace: vso
+spec:
+  vaultConnectionRef: vault-connection
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    role: test-role
+    serviceAccount: default
+    audiences:
+      - vault
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: vault-kv-app
+  namespace: vso
+spec:
+  type: kv-v2
+  mount: test
+  path: secret
+  destination:
+    name: secretkv
+    create: true
+  refreshAfter: 30s
+  vaultAuthRef: static-auth

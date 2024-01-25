@@ -11,5 +11,5 @@ helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets
 helm install -n vault csi secrets-store-csi-driver/secrets-store-csi-driver \
     --set syncSecret.enabled=true
 
-kubectl apply --filename ../manifests/csi-secret-provider-class.yaml
-kubectl apply --filename ../manifests/csi-app-pod.yaml
+kubectl apply --filename ../manifests/csi-secret-provider-class-tls.yaml
+kubectl apply --filename ../manifests/csi-app-pod-tls.yaml

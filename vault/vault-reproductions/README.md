@@ -1,4 +1,4 @@
-This repo spins up a Vault Raft cluster in Kubernetes using the Vault Helm chart
+This repo spins up a Vault cluster in Kubernetes using the Vault Helm chart
 
 # Prerequisites
 
@@ -19,81 +19,142 @@ helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
 ```
 
-# Deploy Vault cluster in Kubernetes
+# About This Environment
+
+* The Vault pods in the primary cluster are deployed in the *vault* namespace
+* The Vault pods in the secondary cluster are deployed in the *vault-secondary* namespace
+* Audit logs are written to */vault/audit/audit.log* 
+* Note that any files in */tmp/vault /tmp/vault-agent* or */tmp/vault-secondary* will be removed when deploying the TLS environment since the certificates are generated and saved in these directories
+* The secondary cluster uses Raft as the storage backend and Shamir unseal 
+* The minimum Vault version required when deploying via the Vault Helm charts is 1.10.0-ent
+  
+## Access Vault Clusters
+
+* Access to Vault cluster(s) can be done using the `kubectl` command line
+
+Primary cluster
+```
+kubectl exec -ti -n vault vault-0 -- sh
+```
+Secondary
+```
+kubectl exec -ti -n vault-secondary vault-secondary-0 -- sh
+```
+
+## Init Keys
+
+* Vault init keys can be found in the following files in the setup directory
+  * init.json (primary cluster)  
+  * init_secondary.json (secondary cluster)
+  * init_auto_unseal.json (Transit cluster)
+
+# Deploy Vault Cluster in Kubernetes
 
 Start Minikube cluster
 ```
 minikube start
 ```
-
-Initialize primary cluster\
+Initialize cluster
 `cd` to **setup** directory
 ```
-./init-primary.sh
+./init.sh
 ```
-
-Initialize secondary cluster (optional, only needed for replication)\
-`cd` to **setup** directory
-```
-./init-secondary.sh
-```
+Follow prompts to set up environment
 
 # Reproduction Scenarios
 
+The following scenarios have been tested on Vault `1.15.2-ent`
+
 `cd` to **scripts** directory
 
-### CSI Provider
+
+## CSI Provider
+
+This script configures the Vault CSI Provider and enables the csi-app-pod application pod to consume Vault secrets using the CSI secrets store volume.
 
 ```
 ./csi_provider.sh
 ```
-
-Check that secret exists in app pod 
+Check that secret was retrieved from Vault and mounted to the application pod's CSI volume
+```
+kubectl exec -n vault csi-app-pod -- cat /mnt/secrets-store/test-object
+```
+**TLS**
+```
+./csi_provider_tls.sh
+```
+Check that secret was retrieved from Vault and mounted to the application pod's CSI volume
 ```
 kubectl exec -n vault csi-app-pod -- cat /mnt/secrets-store/test-object
 ```
 
-### JWT Auth Method Using Kubernetes as OIDC Provider
+## JWT Auth Method Using Kubernetes as OIDC Provider
+
+This script configures the JWT auth method and enables a user to login using the test-role role and service account token.
 
 ```
 ./jwt_auth.sh
 ```
-
-Test login using JWT auth method
+Login to Vault using JWT auth method
 ```
 kubectl exec -ti -n vault vault-0 -- vault write auth/jwt/login role=test-role jwt=@/var/run/secrets/kubernetes.io/serviceaccount/token
 ```
 
-### Kubernetes Auth Method
+## Kubernetes Auth Method
+
+This script configures the Kubernetes auth method and enables authentication to Vault using a service account token.
 
 ```
 ./k8s_auth.sh
 ```
-
-Test login using long-lived token from service account
+Login to Vault using service account token
 ```
 SA_JWT=$(kubectl get secret test-secret -n vault -o go-template='{{ .data.token }}' | base64 --decode)
 ```
 ```
 kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$SA_JWT'", "role": "test-role"}' http://127.0.0.1:8200/v1/auth/kubernetes/login
 ```
-
-Deploy app pod to test k8s auth 
+**TLS**
 ```
-./k8s_auth-app-pod.sh
+./k8s_auth.sh
+```
+Login to Vault using service account token 
+```
+SA_JWT=$(kubectl get secret test-secret -n vault -o go-template='{{ .data.token }}' | base64 --decode)
+```
+```
+kubectl exec -ti -n vault vault-0 -- curl -k --request POST --data '{"jwt": "'$SA_JWT'", "role": "test-role"}' https://127.0.0.1:8200/v1/auth/kubernetes/login
 ```
 
-Export app pod local JWT
+### Deploy App Pod to Test k8s Auth 
+
+This script configures an alpine application pod and enables login to Vault using the application pod's service account token.
+
+```
+./k8s_auth_app_pod.sh
+```
+Export application pod service account token
 ```
 APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 ```
-
-Authenticate from app pod to Vault using local JWT
+Authenticate from application pod to Vault using JWT
 ```
-kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-active.vault.svc.cluster.local:8200/v1/auth/kubernetes/login
+kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://vault-ui.vault.svc.cluster.local:8200/v1/auth/kubernetes/login
+```
+**TLS**
+```
+./k8s_auth_app_pod.sh
+```
+Export application pod service account token
+```
+APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+```
+Authenticate from application pod to Vault using JWT
+```
+kubectl exec -ti -n vault alpine -- curl -k --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' https://vault-ui.vault.svc.cluster.local:8200/v1/auth/kubernetes/login
 ```
 
-### Kubernetes Auth Method with External Vault
+<!-- ### Kubernetes Auth Method with External Vault
 
 Deploy application pod
 `cd` to **setup** directory
@@ -169,186 +230,162 @@ subjects:
     name: default
     namespace: vault
 EOF
-```
+``` -->
 
-Get app pod local JWT
+<!-- Get app pod local JWT
 ```
 APP_POD_LOCAL_JWT=$(kubectl exec -ti -n vault alpine -- cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 ```
 
 Log into Vault using k8s auth from app pod
 ```
-kubectl exec -ti -n vault alpine -- curl -vv --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://$MINIKUBE_HOST_IP:8200/v1/auth/kubernetes/login
-```
+kubectl exec -ti -n vault alpine -- curl -vv --request POST --data '{"jwt": "'$APP_POD_LOCAL_JWT'", "role": "test-role"}' http://$MINIKUBE_HOST_IP:8200/v1/auth/kubernetes/login -->
+<!-- ``` -->
 
-### Replication
+## Replication
+
+These scripts configure replication from the primary to secondary clusters.
 
 Enable PR replication 
 ```
-./performance-replication.sh
+./performance_replication.sh
 ``` 
-
+**TLS**
+```
+./performance_replication_tls.sh
+```
 Enable DR replication
 ```
-./dr-replication.sh
+./dr_replication.sh
 ``` 
+**TLS**
+```
+./dr_replication_tls.sh
+```
+
+## Vault Agent
+
+This script configures the Vault Agent and enables the postgres-<12345> application pod to read secrets rendered by the Vault Agent to a shared volume.
+
+```
+./vault_agent.sh
+```
+Check that secret was rendered in application pod
+```
+kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
+```
+**TLS**
+```
+./vault_agent_tls.sh
+```
+Check that secret was rendered in application pod
+```
+kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
+```
 
 ### Vault Agent with Dynamic Postgres Credentials
 
-```
-./vault-agent-injector-dynamic-postgres-creds.sh
-```
+This script configures the Vault Agent and enables the orgchart-<123> application pod to read secrets rendered by the Vault Agent to a shared volume that are dynamically updated in the postgres application pod.
 
-Check that credentials are automatically updated in sample application pod
+```
+./vault_agent_injector_dynamic_postgres_creds.sh
+```
+Check that credentials are automatically updated in application pod
 ```
 kubectl exec -ti -n vault orgchart-<123> -- sh
 ```
-
 Check database-creds.txt to see credentials update
 ```
 watch -n 1 cat /vault/secrets/database-creds.txt
 ```
-
-Check that credentials are renewed in Postgres pod
+Check that credentials are renewed in Postgres application pod
 ```
 kubectl exec -ti postgres -- sh
 ```
-
 Run while loop to see credentials update
 ```
 while :; do psql -U root -c "SELECT usename, valuntil FROM pg_user;"; sleep 1; done
 ```
 
-### Vault Agent
+### Configure Vault Agent with JWT auto-auth
+
+This script configures the Vault Agent with JWT auto-auth and enables authentication from an postgres-<12345> application pod.
 
 ```
-./vault-agent.sh
+./vault_agent_jwt_auto_auth.sh
 ```
-
-Check that secret exists in postgres app pod
+Check that config.json is rendered with JWT auth
 ```
-kubectl exec -ti postgres-<pod> -- cat /vault/secrets/password.txt
+kubectl exec -ti postgres-<12345> -c vault-agent -- cat /home/vault/config.json
 ```
-
-Configure Vault Agent with JWT auto-auth
+**TLS**
 ```
-./vault-agent-jwt-auto-auth.sh
+./vault_agent_jwt_auto_auth_tls.sh
 ```
-
-Check that config.json is rendered
+Check that config.json is rendered with JWT auth
 ```
 kubectl exec -ti postgres-<12345> -c vault-agent -- cat /home/vault/config.json
 ```
 
-### Vault Secrets Operator
+## Vault Secrets Operator
+
+This script configures the Vault Secrets Operator and syncs a Vault secret to a Kubernetes secret.
 
 ```
-./vault-secrets-operator.sh
+./vault_secrets_operator.sh
 ```
-
+Retrieve k8s secret
+```
+kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
+```
+**TLS**
+```
+./vault_secrets_operator_tls.sh
+```
 Retrieve k8s secret
 ```
 kubectl get secret -n vso secretkv -o jsonpath="{.data.password}" | base64 --decode
 ```
 
-### LDAP 
+## LDAP 
+
+This script configures LDAP auth method and enables login to Vault via using credentials from an OpenLDAP server.
 
 ```
 ./ldap_auth.sh
 ```
-
 Login using LDAP auth
 ```
 kubectl exec -ti -n vault vault-0 -- vault login -method=ldap -path=ldap username="user01" password=password01
 ```
-
 ```
+
+This script configures LDAP secrets engine and allows a user to request credentials for a role.
+
 ./ldap_secrets_engine.sh
 ```
-
 Read credential
 ```
 kubectl exec -ti -n vault vault-0 -- vault read ldap/static-cred/hashicorp-ldap
 ```
 
-### App Role
+## App Role
+
+This script configures AppRole auth method and allows a user to log into Vault using the role_id and secret_id to obtain a token.
 
 ```
-./app-role.sh
-```
-This script will enable app role and login using the role_id and secret_id to obtain a token
-
-### Vault Transit Auto-unseal
-
-`cd` to **setup** directory
-```
-./init-transit-cluster.sh
+./app_role.sh
 ```
 
-Check that Vault pods are initialized and unsealed 
+Login to Vault using AppRole
 ```
-kubectl exec -ti -n vault vault-0 -- vault status
-```
-```
-kubectl exec -ti -n vault vault-1 -- vault status
+ROLE_ID=$(kubectl exec -ti -n vault vault-0 -- vault read -format=json auth/approle/role/my-app-role/role-id | jq -r .data.role_id)
 ```
 ```
-kubectl exec -ti -n vault vault-2 -- vault status
+SECRET_ID=$(kubectl exec -ti -n vault vault-0 -- vault write -format=json -f auth/approle/role/my-app-role/secret-id | jq -r .data.secret_id)
 ```
-
-### TLS
-
-Spin up TLS cluster
-`cd` to **setup** directory
 ```
-./init_cluster_tls.sh
+kubectl exec -ti -n vault vault-0 -- vault write auth/approle/login \
+    role_id=$ROLE_ID \
+    secret_id=$SECRET_ID
 ```
-
-### Vault Agent Injector with TLS
-Spin up TLS cluster
-`cd` to **setup** directory
-```
-./init_cluster_tls.sh
-```
-`cd` to **scripts** directory
-```
-./vault-agent-tls.sh
-```
-Confirm that cluster is using TLS by entering shell session in pod
-```
-kubectl exec -ti -n vault vault-0 -- sh
-```
-Check $VAULT_ADDR to confirm schema is using https
-```
-echo $VAULT_ADDR
-```
-Run `vault status`
-```
-vault status
-```
-Exit pod
-```
-exit
-```
-Check that secret was rendered to application pod
-```
-kubectl exec -ti postgres-<12345> -- cat /vault/secrets/password.txt
-```
-
-### Consul Backend
-
-Deploy Vault Helm chart
-`cd` to **setup** directory
-```
-./init-primary_consul.sh
-```
-
-Check that Vault is using Consul 
-```
-kubectl exec -ti -n vault vault-0 -- vault status
-```
-
-# Sources
-
-* https://developer.hashicorp.com/vault/docs/platform/k8s/helm/examples/standalone-tls
-* https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-minikube-tls#create-the-certificate
